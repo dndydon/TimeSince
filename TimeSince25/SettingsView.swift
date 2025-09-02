@@ -13,7 +13,7 @@ struct SettingsView: View {
       Text("Settings go here")
         .navigationTitle("Settings")
         .toolbar {
-          ToolbarItem(placement: .navigationBarTrailing) {
+          ToolbarItem(placement: .primaryAction) {
             Button("Done") {
               // The sheet will be dismissed automatically
             }

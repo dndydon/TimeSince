@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct TimeSince25App: App {
+struct aTimeSince25App: App {
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
       Item.self,
@@ -28,8 +28,9 @@ struct TimeSince25App: App {
 
   var body: some Scene {
     WindowGroup {
-      ContentView()
+      bMacRootView()
     }
     .modelContainer(sharedModelContainer)
   }
 }
+

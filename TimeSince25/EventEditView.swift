@@ -33,7 +33,7 @@ struct EventEditView: View {
 
         Section(header: Text("Value")) {
           TextField("Enter a number (optional)", text: $valueText)
-            .keyboardType(.decimalPad)
+            .applyKeyboard(.decimal)
         }
 
         Section(header: Text("Notes")) {
@@ -95,4 +95,3 @@ struct EventEditView: View {
   return EventEditView(event: ev) { _ in }
     .modelContainer(for: [Item.self, Event.self], inMemory: true)
 }
-

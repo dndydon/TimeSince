@@ -48,7 +48,7 @@ struct ItemConfigEditView: View {
           Text("Interval")
           Spacer()
           TextField("Interval", text: $remindIntervalText)
-            .keyboardType(.numberPad)
+            .applyKeyboard(.number)
             .multilineTextAlignment(.trailing)
             .frame(maxWidth: 80)
         }
@@ -115,4 +115,3 @@ struct ItemConfigEditView: View {
     ItemConfigEditView(item: item, config: cfg) { _ in }
   }
 }
-

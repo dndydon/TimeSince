@@ -197,11 +197,11 @@ struct ItemView: View {
           }
           .disabled(item?.name.trimmingCharacters(in: .whitespaces).isEmpty != false)
         }
-        ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") {
-            dismiss()
-          }
-        }
+        //ToolbarItem(placement: .cancellationAction) {
+        //  Button("Cancel") {
+        //    dismiss()
+        //  }
+        //}
       }
       .onAppear {
         recalcLastModifiedFromEvents()
@@ -252,8 +252,10 @@ struct ItemView: View {
 
       Spacer()
 
-      // Use EditButton directly (it’s a View)
+      // Use EditButton where available; omit on macOS
+      #if os(iOS) || os(tvOS)
       EditButton().scaleEffect(0.9)
+      #endif
 
       Button {
         addEvent()
@@ -349,8 +351,9 @@ private struct SelectAllOnFocusModifier: ViewModifier {
 
     func updateUIView(_ uiView: UIView, context: Context) {
       guard armed else { return }
-      armed = false
       DispatchQueue.main.async {
+        // Disarm after the update pass to avoid "modifying state during view update"
+        armed = false
         guard let responder = uiView.window?.firstResponder else { return }
         if let tf = responder as? UITextField {
           tf.selectAll(nil)
@@ -368,8 +371,9 @@ private struct SelectAllOnFocusModifier: ViewModifier {
 
     func updateNSView(_ nsView: NSView, context: Context) {
       guard armed else { return }
-      armed = false
       DispatchQueue.main.async {
+        // Disarm after the update pass to avoid "modifying state during view update"
+        armed = false
         // On macOS, SwiftUI TextField uses the window's field editor (NSTextView)
         guard let fieldEditor = nsView.window?.firstResponder as? NSTextView else { return }
         fieldEditor.selectAll(nil)
