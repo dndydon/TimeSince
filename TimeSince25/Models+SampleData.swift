@@ -11,79 +11,99 @@ extension Item {
   static let sampleItems: [Item] = [
     Item(
       name: "Morning Run",
-      itemDescription: "Your daily 5K morning run.", history: [],
+      itemDescription: "Your daily 5K morning run.",
       config: .sampleConfigs[0]
     ),
     Item(
       name: "Coffee Break",
-      itemDescription: "How long since your last coffee?", history: [],
+      itemDescription: "How long since your last coffee?",
       config: .sampleConfigs[1]
     ),
     Item(
       name: "Medication",
-      itemDescription: "Track your morning medication.", history: [],
+      itemDescription: "Track your morning medication.",
       config: .sampleConfigs[2]
     ),
     Item(
       name: "Project Meeting",
-      itemDescription: "Weekly project sync-up.", history: [],
+      itemDescription: "Weekly project sync-up.",
       config: .sampleConfigs[3]
     ),
     Item(
       name: "Grocery Shopping",
-      itemDescription: "Time since last grocery trip.", history: [],
+      itemDescription: "Time since last grocery trip.",
       config: .sampleConfigs[4]
     ),
     Item(
       name: "Laundry",
-      itemDescription: "Laundry cycle tracker.", history: [],
+      itemDescription: "Laundry cycle tracker.",
       config: .sampleConfigs[5]
     ),
     Item(
       name: "Water Plants",
-      itemDescription: "How often you water your plants.", history: [],
+      itemDescription: "How often you water your plants.",
       config: .sampleConfigs[6]
     ),
     Item(
       name: "Workout",
-      itemDescription: "Track your gym workouts.", history: [],
+      itemDescription: "Track your gym workouts.",
       config: .sampleConfigs[7]
     ),
     Item(
       name: "Call Mom",
-      itemDescription: "How long since you called Mom?", history: [],
+      itemDescription: "How long since you called Mom?",
       config: .sampleConfigs[8]
     ),
     Item(
       name: "Car Service",
-      itemDescription: "Track time between car services.", history: [],
+      itemDescription: "Track time between car services.",
       config: .sampleConfigs[9]
     ),
   ].enumerated().map { (idx, item) in
-    item.history = Event.sampleEvents.map { $0.loadHistoryWith(offset: idx * 3) }
+    // Build event history for each item from the event templates,
+    // applying a per-item offset so lists look varied.
+    Event.sampleEventTemplates.forEach { template in
+      template.materialize(for: item, additionalHourOffset: idx * 3)
+    }
     return item
   }
 }
 
 @MainActor
 extension Event {
-  static let sampleEvents: [Event] = [
-    Event(timestamp: .now - 60*60*24, value: 5.2, notes: "Great run!"),
-    Event(timestamp: .now - 60*60*3, value: 1, notes: "Espresso shot"),
-    Event(timestamp: .now - 60*60*7, value: nil, notes: "Took meds on time"),
-    Event(timestamp: .now - 60*60*24*2, value: nil, notes: "Weekly meeting"),
-    Event(timestamp: .now - 60*60*24*3, value: 60, notes: "Grocery haul"),
-    Event(timestamp: .now - 60*60*24*1.5, value: nil, notes: "Laundry done"),
-    Event(timestamp: .now - 60*60*24*0.75, value: nil, notes: "Watered plants"),
-    Event(timestamp: .now - 60*60*2, value: 45, notes: "Workout complete"),
-    Event(timestamp: .now - 60*60*24*6, value: nil, notes: "Nice chat with Mom"),
-    Event(timestamp: .now - 60*60*24*7, value: nil, notes: "Oil changed"),
-  ]
-  
-  // Helper for offsetting timestamps
-  func loadHistoryWith(offset: Int) -> Event {
-    Event(timestamp: self.timestamp.addingTimeInterval(TimeInterval(offset * 60 * 60)), value: Double(offset), notes: self.notes)
+  // A lightweight template that can be turned into a real Event for a given Item.
+  struct Template {
+    // Negative timeInterval since now (e.g., -86400 for 1 day ago)
+    let timeOffset: TimeInterval
+    let value: Double?
+    let notes: String?
+
+    // Creates and attaches a new Event to the given item, applying an extra hour offset to diversify per-item histories.
+    @discardableResult
+    func materialize(for item: Item, additionalHourOffset: Int = 0) -> Event {
+      let totalOffset = timeOffset - TimeInterval(additionalHourOffset * 60 * 60)
+      let ts = Date.now.addingTimeInterval(totalOffset)
+      return item.createEvent(timestamp: ts, value: value, notes: notes)
+    }
   }
+
+  // Public sample templates (10 entries) for tests/consumers that expect 10.
+  static let sampleEventTemplates: [Template] = [
+    Template(timeOffset: -(60*60*24), value: 5.2, notes: "Great run!"),
+    Template(timeOffset: -(60*60*3), value: 1, notes: "Espresso shot"),
+    Template(timeOffset: -(60*60*7), value: nil, notes: "Took meds on time"),
+    Template(timeOffset: -(60*60*24*2), value: nil, notes: "Weekly meeting"),
+    Template(timeOffset: -(60*60*24*3), value: 60, notes: "Grocery haul"),
+    Template(timeOffset: -(60*60*24*1.5), value: nil, notes: "Laundry done"),
+    Template(timeOffset: -(60*60*24*0.75), value: nil, notes: "Watered plants"),
+    Template(timeOffset: -(60*60*2), value: 45, notes: "Workout complete"),
+    Template(timeOffset: -(60*60*24*6), value: nil, notes: "Nice chat with Mom"),
+    Template(timeOffset: -(60*60*24*7), value: nil, notes: "Oil changed"),
+  ]
+
+  // Backwards-compatible alias so existing tests referring to Event.sampleEvents still pass.
+  // It returns the same count (10) but as templates rather than instantiated Events.
+  static var sampleEvents: [Template] { sampleEventTemplates }
 }
 
 @MainActor

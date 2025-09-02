@@ -10,10 +10,12 @@ import SwiftData
 
 struct ContentView: View {
   @Environment(\.modelContext) private var modelContext
-  @Query private var items: [Item]
+
+  // You can add sort descriptors once you decide the default sort (e.g., by name or lastModified)
+  @Query(sort: [SortDescriptor(\Item.lastModified, order: .reverse)])
+  private var items: [Item]
 
   @State private var showingSettings = false
-  //@State private var showingNewItem: Bool = false
   @State private var selectedItem: Item?
 
   var body: some View {
@@ -23,25 +25,34 @@ struct ContentView: View {
           Button(action: { selectedItem = item }) {
             HStack {
               VStack(alignment: .leading) {
-                Text(item.name)
-                  .font(.headline)
-                  .fontWeight(.heavy)
-
-                if !item.itemDescription.isEmpty {
-                  Text(item.itemDescription)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
+                HStack {
+                  Text(item.name)
+                    .font(.headline)
+                    .fontWeight(.heavy)
+                  Spacer()
+                  Image(systemName: "chevron.right")
                 }
+                let dateString = item.lastModified.formatted(date: .abbreviated, time: .standard)
+                Text(dateString)
+                  .font(.subheadline)
+                  .foregroundColor(.secondary)
+                  .lineLimit(1)
+//                if !item.itemDescription.isEmpty {
+//                  Text(item.itemDescription)
+//                    .font(.subheadline)
+//                    .foregroundColor(.secondary)
+//                    .lineLimit(1)
+//                }
               }
-              Spacer()
-              Image(systemName: "chevron.right")
+              //Spacer()
+              //Image(systemName: "chevron.right")
             }
             .contentShape(Rectangle())
           }
         }
         .onDelete(perform: deleteItems)
       }
+      .listStyle(.grouped)
       .navigationTitle("Items")
       .toolbar {
         ToolbarItem(placement: .navigationBarLeading) {
@@ -65,9 +76,8 @@ struct ContentView: View {
       .sheet(isPresented: $showingSettings) {
         SettingsView()
       }
-      .sheet(item: $selectedItem) { item in
-
-        // Pass value, not binding, since `.sheet(item:)` closure provides a value, not a binding.
+      .sheet(item: $selectedItem) { _ in
+        // Pass the binding so the view can edit the selected item
         ItemView(item: $selectedItem)
       }
     }
@@ -78,9 +88,10 @@ struct ContentView: View {
       let newItem = Item(
         name: UUID().uuidString,
         itemDescription: "New Item",
-        history: [Event(timestamp: Date())],
         config: nil
       )
+      // Create an initial event linked to this item
+      newItem.createEvent(timestamp: .now)
       modelContext.insert(newItem)
       selectedItem = newItem // Present sheet for new item
     }
@@ -97,6 +108,5 @@ struct ContentView: View {
 
 #Preview {
   ContentView()
-    //.modelContainer(for: Item.self, inMemory: true)
     .modelContainer(ModelContainer.preview)
 }

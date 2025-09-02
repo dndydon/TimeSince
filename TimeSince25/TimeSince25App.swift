@@ -13,6 +13,9 @@ struct TimeSince25App: App {
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
       Item.self,
+      Event.self,
+      ItemConfig.self,
+      Settings.self
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
