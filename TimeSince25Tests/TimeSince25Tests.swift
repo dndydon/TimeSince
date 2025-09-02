@@ -67,16 +67,18 @@ struct TimeSince25Tests {
     print("--- Item Relationships ---")
     let cfg = ItemConfig(configName: "RelConfig", reminding: false, remindAt: .now, remindInterval: 1, timeUnits: .day)
     let item = Item(name: "RelItem", itemDescription: "With relationships", config: cfg)
+    #expect(item.history.count == 1)
+    #expect(item.history.first?.notes == nil)
     let ev1 = Event(item: item, timestamp: .now, value: 1, notes: "First")
     let ev2 = Event(item: item, timestamp: .now, value: 2, notes: "Second")
     item.addEvent(ev1)
     item.addEvent(ev2)
     #expect(item.config?.configName == "RelConfig")
-    #expect(item.history.count == 2)
-    #expect(item.history.first?.notes == "First")
+    #expect(item.history.count == 3)
+    #expect(item.history.first?.notes == nil)
     // Remove one event
     item.history.removeFirst()
-    #expect(item.history.count == 1)
+    #expect(item.history.count == 2)
     print("Remaining event notes: \(item.history.first?.notes ?? "none")")
   }
 

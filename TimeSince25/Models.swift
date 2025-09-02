@@ -9,7 +9,10 @@ import Foundation
 import SwiftData
 
 @Model
-class Item {
+class Item: Identifiable, Hashable {
+  // Stable identity separate from the user-visible name
+  var id: UUID
+
   // Unique and indexed for faster search
   @Attribute(.unique)
   var name: String
@@ -26,31 +29,39 @@ class Item {
   var config: ItemConfig?
 
   init(
+    id: UUID = UUID(),
     name: String,
     itemDescription: String,
-    // history: [Event] = [],    // watch out if given input Events
     config: ItemConfig? = nil,
     createdAt: Date = .now,
     lastModified: Date = .now
   ) {
+    self.id = id
     self.name = name
     self.itemDescription = itemDescription
     self.config = config
-    // If history is provided input, ensure inverse is set
-    // self.history = [] // start every new Item with an empty history
     self.createdAt = createdAt
     self.lastModified = .now
-    let event = createEvent()
-    self.addEvent(event)
+    // Create an initial event linked to this item (createEvent appends it)
+    _ = createEvent()
+  }
+
+  // MARK: - Hashable
+  static func == (lhs: Item, rhs: Item) -> Bool {
+    lhs.id == rhs.id
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
   }
 
   // Convenience to add an Event and maintain the inverse
   func addEvent(_ event: Event) {
-    // If the event already belongs to another item, you may decide to
-    // either move it or reject it. Here we reassign to this Item.
+    // Reassign to this Item to ensure inverse is correct
     event.item = self
-
-    history.append(event)
+    if history.contains(where: { $0 === event }) == false {
+      history.append(event)
+    }
     self.lastModified = .now
   }
 
@@ -136,8 +147,9 @@ enum Units: String, Codable {
 //    var font: String
 //    var color: String
 //    
-//    init(font: String = "System", color: String = "primary") {
+//    init(font: String = "System", color: "primary") {
 //        self.font = font
 //        self.color = color
 //    }
 //}
+

@@ -21,7 +21,7 @@ struct ContentView: View {
   var body: some View {
     NavigationStack {
       List {
-        ForEach(items, id: \.name) { item in
+        ForEach(items) { item in
           Button(action: { selectedItem = item }) {
             HStack {
               VStack(alignment: .leading) {
@@ -37,15 +37,7 @@ struct ContentView: View {
                   .font(.subheadline)
                   .foregroundColor(.secondary)
                   .lineLimit(1)
-//                if !item.itemDescription.isEmpty {
-//                  Text(item.itemDescription)
-//                    .font(.subheadline)
-//                    .foregroundColor(.secondary)
-//                    .lineLimit(1)
-//                }
               }
-              //Spacer()
-              //Image(systemName: "chevron.right")
             }
             .contentShape(Rectangle())
           }
@@ -85,13 +77,13 @@ struct ContentView: View {
 
   private func addItem() {
     withAnimation {
+      let newName = uniqueDefaultName(base: "Untitled")
       let newItem = Item(
-        name: UUID().uuidString,
-        itemDescription: "New Item",
+        name: newName,
+        itemDescription: "",
         config: nil
       )
-      // Create an initial event linked to this item
-      newItem.createEvent(timestamp: .now)
+      // Item initializer already creates an initial event.
       modelContext.insert(newItem)
       selectedItem = newItem // Present sheet for new item
     }
@@ -103,6 +95,22 @@ struct ContentView: View {
         modelContext.delete(items[index])
       }
     }
+  }
+
+  // Generate a unique name like "Untitled", "Untitled 2", "Untitled 3", ...
+  private func uniqueDefaultName(base: String) -> String {
+    let existingNames = Set(items.map { $0.name })
+    if !existingNames.contains(base) {
+      return base
+    }
+    // Try a reasonable range, then fall back to a timestamp to guarantee a return.
+    for n in 2...10_000 {
+      let candidate = "\(base) \(n)"
+      if !existingNames.contains(candidate) {
+        return candidate
+      }
+    }
+    return "\(base) \(Int(Date().timeIntervalSince1970))"
   }
 }
 

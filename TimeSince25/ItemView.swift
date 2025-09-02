@@ -17,6 +17,12 @@ struct ItemView: View {
   @State private var selectedEvent: Event?
   @State private var showingEventEditor: Bool = false
 
+  // Focus handling for text selection
+  private enum FocusedField: Hashable {
+    case name, description
+  }
+  @FocusState private var focusedField: FocusedField?
+
   var body: some View {
     NavigationStack {
       Form {
@@ -31,6 +37,8 @@ struct ItemView: View {
               }
             ))
             .font(Font.custom("SF Pro Text", size: 22, relativeTo: .headline))
+            .focused($focusedField, equals: .name)
+            .selectAllOnFocus(when: focusedField == .name)
           } else {
             TextField("Enter item name", text: .constant(""))
               .disabled(true)
@@ -46,6 +54,8 @@ struct ItemView: View {
                 touchLastModified()
               }
             ))
+            .focused($focusedField, equals: .description)
+            .selectAllOnFocus(when: focusedField == .description)
           } else {
             TextField("Enter description", text: .constant(""))
               .disabled(true)
@@ -192,11 +202,6 @@ struct ItemView: View {
             dismiss()
           }
         }
-        //ToolbarItem(placement: .navigationBarTrailing) {
-        //  if (item?.history.isEmpty == false) {
-        //    EditButton()
-        //  }
-        //}
       }
       .onAppear {
         recalcLastModifiedFromEvents()
@@ -236,12 +241,10 @@ struct ItemView: View {
   private func historyHeader() -> some View {
     HStack {
       Button(action: { toggleSort() }) {
-        HStack(spacing: 6) {
+        HStack(spacing: 9) {
           Text("History")
-            .font(.headline)
           Image(systemName: sortDescending ? "arrow.down" : "arrow.up")
-            .font(.subheadline)
-            .foregroundColor(.secondary)
+            .foregroundColor(.accentColor)
             .accessibilityLabel(sortDescending ? "Sorted newest first" : "Sorted oldest first")
         }
       }
@@ -250,7 +253,7 @@ struct ItemView: View {
       Spacer()
 
       // Use EditButton directly (it’s a View)
-      EditButton()
+      EditButton().scaleEffect(0.9)
 
       Button {
         addEvent()
@@ -268,11 +271,7 @@ struct ItemView: View {
   private func sortedHistory() -> [Event]? {
     guard let history = item?.history else { return nil }
     return history.sorted(by: { a, b in
-      if sortDescending {
-        return a.timestamp > b.timestamp
-      } else {
-        return a.timestamp < b.timestamp
-      }
+      sortDescending ? (a.timestamp > b.timestamp) : (a.timestamp < b.timestamp)
     })
   }
 
@@ -291,15 +290,15 @@ struct ItemView: View {
   }
 
   private func deleteEvents(at offsets: IndexSet) {
-    guard let item else { return }
+    guard item != nil else { return }
     let sorted = sortedHistory() ?? []
     let eventsToDelete = offsets.map { sorted[$0] }
+
+    // Delete from the model context first; inverse will update the array
     for ev in eventsToDelete {
-      if let idx = item.history.firstIndex(where: { $0 === ev }) {
-        item.history.remove(at: idx)
-      }
       modelContext.delete(ev)
     }
+
     recalcLastModifiedFromEvents()
   }
 
@@ -323,6 +322,84 @@ struct ItemView: View {
       // If no events, keep lastModified at least createdAt
       item.lastModified = max(item.createdAt, item.lastModified)
     }
+  }
+}
+
+// MARK: - Reusable modifier: Select all text when view is focused (cross-platform)
+
+private struct SelectAllOnFocusModifier: ViewModifier {
+  @State private var armed: Bool = false
+  let condition: Bool
+
+  func body(content: Content) -> some View {
+    content
+      .background(SelectionPerformer(armed: $armed))
+      .onChange(of: condition) { _, newValue in
+        if newValue {
+          armed = true
+        }
+      }
+  }
+
+#if os(iOS) || os(tvOS)
+  private struct SelectionPerformer: UIViewRepresentable {
+    @Binding var armed: Bool
+
+    func makeUIView(context: Context) -> UIView { UIView(frame: .zero) }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+      guard armed else { return }
+      armed = false
+      DispatchQueue.main.async {
+        guard let responder = uiView.window?.firstResponder else { return }
+        if let tf = responder as? UITextField {
+          tf.selectAll(nil)
+        } else if let tv = responder as? UITextView {
+          tv.selectAll(nil)
+        }
+      }
+    }
+  }
+#elseif os(macOS)
+  private struct SelectionPerformer: NSViewRepresentable {
+    @Binding var armed: Bool
+
+    func makeNSView(context: Context) -> NSView { NSView(frame: .zero) }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+      guard armed else { return }
+      armed = false
+      DispatchQueue.main.async {
+        // On macOS, SwiftUI TextField uses the window's field editor (NSTextView)
+        guard let fieldEditor = nsView.window?.firstResponder as? NSTextView else { return }
+        fieldEditor.selectAll(nil)
+      }
+    }
+  }
+#endif
+}
+
+#if os(iOS) || os(tvOS)
+import UIKit
+
+private extension UIView {
+  var firstResponder: UIResponder? {
+    if isFirstResponder { return self }
+    for sub in subviews {
+      if let r = sub.firstResponder { return r }
+    }
+    return nil
+  }
+}
+#elseif os(macOS)
+import AppKit
+#endif
+
+private extension View {
+  // Attach to any TextField or text input view.
+  // Pass a condition that becomes true when this view is focused.
+  func selectAllOnFocus(when condition: Bool) -> some View {
+    modifier(SelectAllOnFocusModifier(condition: condition))
   }
 }
 
