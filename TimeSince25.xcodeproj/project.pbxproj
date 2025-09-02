@@ -29,9 +29,32 @@
 		F8F8CFE72E665072006991BF /* TimeSince25UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimeSince25UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F8F8CFFC2E665A15006991BF /* Exceptions for "TimeSince25" folder in "TimeSince25Tests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models.swift,
+				"Models+SampleData.swift",
+			);
+			target = F8F8CFDC2E665072006991BF /* TimeSince25Tests */;
+		};
+		F8F8CFFD2E665A15006991BF /* Exceptions for "TimeSince25" folder in "TimeSince25UITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models.swift,
+				"Models+SampleData.swift",
+			);
+			target = F8F8CFE62E665072006991BF /* TimeSince25UITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F8F8CFD02E665072006991BF /* TimeSince25 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F8F8CFFC2E665A15006991BF /* Exceptions for "TimeSince25" folder in "TimeSince25Tests" target */,
+				F8F8CFFD2E665A15006991BF /* Exceptions for "TimeSince25" folder in "TimeSince25UITests" target */,
+			);
 			path = TimeSince25;
 			sourceTree = "<group>";
 		};

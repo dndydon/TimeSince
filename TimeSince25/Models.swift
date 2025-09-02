@@ -5,7 +5,6 @@
 //  Created by Don Sleeter on 9/1/25.
 //
 
-
 import Foundation
 import SwiftData
 
@@ -18,9 +17,10 @@ class Item {
   var history: [Event] = []
   var config: ItemConfig?
 
-  init(name: String, description: String, config: ItemConfig? = nil) {
+  init(name: String, itemDescription: String, history: [Event], config: ItemConfig? = nil) {
     self.name = name
-    self.itemDescription = description
+    self.itemDescription = itemDescription
+    self.history = history
     self.config = config
   }
 }
@@ -36,6 +36,9 @@ class Event {
     self.value = value
     self.notes = notes
   }
+  init() {
+    self.timestamp = .now
+  }
 }
 
 @Model
@@ -46,8 +49,8 @@ class ItemConfig {
   var remindInterval: Int
   var timeUnits: Units
 
-  init(description: String, reminding: Bool, remindAt: Date, remindInterval: Int, timeUnits: Units) {
-    self.configName = description
+  init(configName: String, reminding: Bool, remindAt: Date, remindInterval: Int, timeUnits: Units) {
+    self.configName = configName
     self.reminding = reminding
     self.remindAt = remindAt
     self.remindInterval = remindInterval
@@ -58,48 +61,35 @@ class ItemConfig {
 @Model
 class Settings {
   var displayTimesUsing: DisplayTimesUsing
-  var displayTheme: Theme
+  //var displayTheme: Theme
 
-  init(displayTimesUsing: DisplayTimesUsing, displayTheme: Theme) {
+  init(displayTimesUsing: DisplayTimesUsing = .tenths, /*displayTheme: Theme*/ ) {
     self.displayTimesUsing = displayTimesUsing
-    self.displayTheme = displayTheme
+    //self.displayTheme = displayTheme
   }
 }
 
-enum DisplayTimesUsing: Codable {
-  case tenths
-  case subUnits
+enum DisplayTimesUsing: String, Codable {
+  case tenths = "tenths"
+  case subUnits = "subUnits"
 }
 
 enum Units: String, Codable {
+  case minute
+  case hour
   case day
-  // add others as needed
+  case week
+  case month
+  case year
 }
 
 // You might want to expand Theme as needed, for now as a placeholder:
-struct Theme: Codable {
-    var font: String
-    var color: String
-
-    enum CodingKeys: String, CodingKey {
-        case font
-        case color
-    }
-
-    init(font: String, color: String) {
-        self.font = font
-        self.color = color
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        font = try container.decode(String.self, forKey: .font)
-        color = try container.decode(String.self, forKey: .color)
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(font, forKey: .font)
-        try container.encode(color, forKey: .color)
-    }
-}
+//struct Theme: Codable, Equatable {
+//    var font: String
+//    var color: String
+//    
+//    init(font: String = "System", color: String = "primary") {
+//        self.font = font
+//        self.color = color
+//    }
+//}
