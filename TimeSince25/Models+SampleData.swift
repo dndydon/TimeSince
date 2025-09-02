@@ -60,7 +60,7 @@ extension Item {
       config: .sampleConfigs[9]
     ),
   ].enumerated().map { (idx, item) in
-    item.history = Event.sampleEvents.map { $0.copyWith(offset: idx * 3) }
+    item.history = Event.sampleEvents.map { $0.loadHistoryWith(offset: idx * 3) }
     return item
   }
 }
@@ -81,8 +81,8 @@ extension Event {
   ]
   
   // Helper for offsetting timestamps
-  func copyWith(offset: Int) -> Event {
-    Event(timestamp: self.timestamp.addingTimeInterval(TimeInterval(offset * 60 * 60)), value: self.value, notes: self.notes)
+  func loadHistoryWith(offset: Int) -> Event {
+    Event(timestamp: self.timestamp.addingTimeInterval(TimeInterval(offset * 60 * 60)), value: Double(offset), notes: self.notes)
   }
 }
 

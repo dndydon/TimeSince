@@ -21,15 +21,21 @@ struct ContentView: View {
       List {
         ForEach(items, id: \.name) { item in
           Button(action: { selectedItem = item }) {
-            VStack(alignment: .leading) {
-              Text(item.name)
-                .font(.headline)
-              if !item.itemDescription.isEmpty {
-                Text(item.itemDescription)
-                  .font(.subheadline)
-                  .foregroundColor(.secondary)
-                  .lineLimit(1)
+            HStack {
+              VStack(alignment: .leading) {
+                Text(item.name)
+                  .font(.headline)
+                  .fontWeight(.heavy)
+
+                if !item.itemDescription.isEmpty {
+                  Text(item.itemDescription)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                }
               }
+              Spacer()
+              Image(systemName: "chevron.right")
             }
             .contentShape(Rectangle())
           }

@@ -19,6 +19,7 @@ struct ItemView: View {
               get: { item?.name ?? "" },
               set: { newValue in item?.name = newValue }
             ))
+            .font(Font.custom("SF Pro Text", size: 22, relativeTo: .headline))
           } else {
             TextField("Enter item name", text: .constant(""))
               .disabled(true)
@@ -77,15 +78,13 @@ struct ItemView: View {
 }
 
 #Preview {
-  ItemView(
-    item: .constant(
-      Item(
-        name: "Sample Item",
-        itemDescription: "A sample description",
-        history: [Event.sampleEvents.first!],
-        config: nil
-      )
-    )
+  @Previewable @State var item: Item? = Item(
+    name: "Sample Item",
+    itemDescription: "A sample description",
+    history: [Event.sampleEvents.first!],
+    config: nil
   )
+
+  ItemView(item: $item)
     .modelContainer(for: Item.self, inMemory: true)
 }

@@ -36,9 +36,6 @@ class Event {
     self.value = value
     self.notes = notes
   }
-  init() {
-    self.timestamp = .now
-  }
 }
 
 @Model
