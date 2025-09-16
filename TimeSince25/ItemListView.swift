@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import Combine
 
 struct ItemListView: View {
   @Environment(\.modelContext) private var modelContext
@@ -15,42 +16,49 @@ struct ItemListView: View {
   @Query(sort: [SortDescriptor(\Item.lastModified, order: .reverse)])
   private var items: [Item]
 
+  // Fetch the (single) Settings row to drive display formatting.
+  @Query private var settingsRows: [Settings]
+
   // The selection is owned by the parent (split view); sidebar reads/writes it.
   @Binding var selection: Item?
 
   @State private var showingSettings = false
+
+  // Shared clock driving dynamic updates (due highlighting and elapsed text)
+  @State private var nowTick: Date = .now
+  private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
   init(selection: Binding<Item?>) {
     self._selection = selection
   }
 
   var body: some View {
+    // Determine the active display mode; default to .tenths if no row exists yet.
+    let displayMode: DisplayTimesUsing = settingsRows.first?.displayTimesUsing ?? .tenths
+
     List(selection: $selection) {
       ForEach(items) { item in
-        HStack {
-          VStack(alignment: .leading) {
-            HStack {
-              Text(item.name)
-                .font(.headline)
-                .fontWeight(.heavy)
-              Spacer()
-              Image(systemName: "chevron.right")
-                .foregroundColor(.secondary)
+
+        ItemCellView(
+          item: item,
+          nowTick: nowTick,
+          displayMode: displayMode,
+          onLongPress: { pressedItem in
+            // Provide haptic feedback (iOS) and animate the mutation so the row reorders with animation.
+            performHapticForLongPress()
+            withAnimation(.easeInOut) {
+              _ = pressedItem.createEvent(timestamp: .now)
+              // createEvent updates lastModified; @Query sorts by lastModified desc, so this row moves to top.
             }
-            let dateString = item.lastModified.formatted(date: .abbreviated, time: .standard)
-            Text(dateString)
-              .font(.subheadline)
-              .foregroundColor(.secondary)
-              .lineLimit(1)
           }
-        }
-        .tag(item) // keep tag for List(selection:)
-        .contentShape(Rectangle()) // make the whole row tappable/clickable
-        .onTapGesture {
-          // Update split view selection so the detail shows
-          selection = item
-        }
-        .accessibilityAddTraits(.isButton)
+        )
+          .tag(item) // keep tag for List(selection:)
+          .contentShape(Rectangle()) // make the whole row tappable/clickable
+          .onTapGesture {
+            // Update split view selection so the detail shows
+            selection = item
+          }
+          .accessibilityAddTraits(.isButton)
       }
       .onDelete(perform: deleteItems)
     }
@@ -59,26 +67,29 @@ struct ItemListView: View {
 #else
     .listStyle(.inset)
 #endif
-    .navigationTitle("Items")
+    .navigationTitle("TimeSince")
+    .navigationBarTitleDisplayMode(.inline)
     .toolbar {
 #if os(iOS)
+      // Leading: Info (question mark) to open settings/info sheet
       ToolbarItem(placement: .navigationBarLeading) {
         Button {
           showingSettings = true
         } label: {
-          Label("Settings", systemImage: "gearshape")
+          Label("Info", systemImage: "ellipsis")
         }
+        .accessibilityLabel("Info")
       }
-      ToolbarItem(placement: .navigationBarTrailing) {
+
+      // Trailing: Edit first (left-most), then Add
+      ToolbarItemGroup(placement: .navigationBarTrailing) {
         EditButton()
-      }
-      ToolbarItem(placement: .navigationBarTrailing) {
         Button(action: addItem) {
           Label("Add Item", systemImage: "plus")
         }
       }
 #else
-      // macOS toolbar placements
+      // macOS toolbar placements (unchanged)
       ToolbarItem(placement: .navigation) {
         Button {
           showingSettings = true
@@ -94,7 +105,11 @@ struct ItemListView: View {
 #endif
     }
     .sheet(isPresented: $showingSettings) {
-      SettingsView()
+      InfoView()
+    }
+    // Drive periodic updates for due/highlight and elapsed text
+    .onReceive(timer) { tick in
+      nowTick = tick  // this should make ticks reactive updating.
     }
   }
 
@@ -106,7 +121,7 @@ struct ItemListView: View {
         itemDescription: "",
         config: nil
       )
-      // Item initializer already creates an initial event.
+      // Item initializer already creates an initial event and default config.
       modelContext.insert(newItem)
       selection = newItem // select it in the split view
     }
@@ -138,6 +153,19 @@ struct ItemListView: View {
       }
     }
     return "\(base) \(Int(Date().timeIntervalSince1970))"
+  }
+
+  // MARK: - Haptics
+
+  private func performHapticForLongPress() {
+#if os(iOS)
+    // Prefer notification feedback to signal a successful action.
+    let generator = UINotificationFeedbackGenerator()
+    generator.notificationOccurred(.success)
+    // Alternatively, use impact:
+    // let impact = UIImpactFeedbackGenerator(style: .medium)
+    // impact.impactOccurred()
+#endif
   }
 }
 

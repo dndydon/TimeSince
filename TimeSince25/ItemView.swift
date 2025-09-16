@@ -17,6 +17,9 @@ struct ItemView: View {
   @State private var selectedEvent: Event?
   @State private var showingEventEditor: Bool = false
 
+  // Force list refresh when events are saved/deleted from the sheet
+  @State private var historyVersion: Int = 0
+
   // Focus handling for text selection
   private enum FocusedField: Hashable {
     case name, description
@@ -62,48 +65,6 @@ struct ItemView: View {
           }
         }
 
-        // MARK: - Dates
-        Section(header: Text("Dates")) {
-          if let item {
-            NavigationLink {
-              DateEditView(
-                title: "Created At",
-                date: item.createdAt,
-                onSave: { newDate in
-                  item.createdAt = newDate
-                  // Keep lastModified based on events primarily
-                  recalcLastModifiedFromEvents()
-                }
-              )
-            } label: {
-              HStack {
-                Text("Created At")
-                Spacer()
-                Text(item.createdAt.formatted(date: .numeric, time: .shortened))
-                  .foregroundColor(.secondary)
-              }
-            }
-
-            HStack {
-              Text("Last Modified")
-              Spacer()
-              Text(item.lastModified.formatted(date: .numeric, time: .shortened))
-                .foregroundColor(.secondary)
-            }
-          } else {
-            HStack {
-              Text("Created At")
-              Spacer()
-              Text("—").foregroundColor(.secondary)
-            }
-            HStack {
-              Text("Last Modified")
-              Spacer()
-              Text("—").foregroundColor(.secondary)
-            }
-          }
-        }
-
         // MARK: - Configuration
         Section(header: Text("Reminding")) {
           if let item {
@@ -123,31 +84,18 @@ struct ItemView: View {
                 }
               } label: {
                 HStack {
-                  VStack(alignment: .leading, spacing: 4) {
-                    Text(cfg.configName)
-                      .font(.headline)
-                    HStack(spacing: 8) {
-                      if cfg.reminding {
-                        Image(systemName: "bell.fill")
-                          .foregroundColor(.orange)
-                        Text(cfg.remindAt.formatted(date: .abbreviated, time: .shortened))
-                          .foregroundColor(.secondary)
-                      } else {
-                        Image(systemName: "bell.slash")
-                          .foregroundColor(.secondary)
-                        Text("Reminders off")
-                          .foregroundColor(.secondary)
-                      }
-                    }
-                    .font(.subheadline)
-                  }
+                  Text(RemindLogic.reminderSummary(config: cfg))
+                    .font(.headline)
+                  Spacer()
+                  Image(systemName: "chevron.right")
+                    .foregroundStyle(.secondary)
                 }
               }
             } else {
               Button {
                 // Create a default config and open editor
                 let cfg = ItemConfig(
-                  configName: "New Configuration",
+                  configName: "New Reminder",
                   reminding: false,
                   remindAt: .now,
                   remindInterval: 1,
@@ -169,7 +117,8 @@ struct ItemView: View {
         Section(header: historyHeader()) {
           if let sorted = sortedHistory(), !sorted.isEmpty {
             List {
-              ForEach(sorted) { event in
+              // Include historyVersion in the ForEach id space to ensure refresh
+              ForEach(sorted, id: \.id) { event in
                 Button {
                   selectedEvent = event
                   showingEventEditor = true
@@ -189,7 +138,7 @@ struct ItemView: View {
           }
         }
       }
-      .navigationTitle("Item")
+      .navigationTitle(item?.name ?? "Item")
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
           Button("Save") {
@@ -197,11 +146,6 @@ struct ItemView: View {
           }
           .disabled(item?.name.trimmingCharacters(in: .whitespaces).isEmpty != false)
         }
-        //ToolbarItem(placement: .cancellationAction) {
-        //  Button("Cancel") {
-        //    dismiss()
-        //  }
-        //}
       }
       .onAppear {
         recalcLastModifiedFromEvents()
@@ -213,6 +157,8 @@ struct ItemView: View {
           if newVal == false {
             // ensure lastModified reflects latest event timestamp after dismissal
             recalcLastModifiedFromEvents()
+            // Force a refresh even when lastModified didn’t change
+            historyVersion &+= 1
           }
         })
       ) {
@@ -221,9 +167,11 @@ struct ItemView: View {
             switch action {
             case .saved:
               recalcLastModifiedFromEvents()
+              historyVersion &+= 1
             case .deleted:
               selectedEvent = nil
               recalcLastModifiedFromEvents()
+              historyVersion &+= 1
             case .cancelled:
               break
             }
@@ -252,11 +200,6 @@ struct ItemView: View {
 
       Spacer()
 
-      // Use EditButton where available; omit on macOS
-      #if os(iOS) || os(tvOS)
-      EditButton().scaleEffect(0.9)
-      #endif
-
       Button {
         addEvent()
       } label: {
@@ -264,7 +207,6 @@ struct ItemView: View {
           .labelStyle(.iconOnly)
       }
       .buttonStyle(.automatic)
-      .padding(.leading, 5)
     }
   }
 
@@ -272,6 +214,8 @@ struct ItemView: View {
 
   private func sortedHistory() -> [Event]? {
     guard let history = item?.history else { return nil }
+    // Touch historyVersion so SwiftUI knows to recompute when it changes
+    _ = historyVersion
     return history.sorted(by: { a, b in
       sortDescending ? (a.timestamp > b.timestamp) : (a.timestamp < b.timestamp)
     })
@@ -302,6 +246,7 @@ struct ItemView: View {
     }
 
     recalcLastModifiedFromEvents()
+    historyVersion &+= 1
   }
 
   private func saveItem() {
@@ -327,7 +272,21 @@ struct ItemView: View {
   }
 }
 
-// MARK: - Reusable modifier: Select all text when view is focused (cross-platform)
+#if os(iOS) || os(tvOS)
+import UIKit
+
+private extension UIView {
+  var firstResponder: UIResponder? {
+    if isFirstResponder { return self }
+    for sub in subviews {
+      if let r = sub.firstResponder { return r }
+    }
+    return nil
+  }
+}
+#elseif os(macOS)
+import AppKit
+#endif
 
 private struct SelectAllOnFocusModifier: ViewModifier {
   @State private var armed: Bool = false
@@ -352,7 +311,6 @@ private struct SelectAllOnFocusModifier: ViewModifier {
     func updateUIView(_ uiView: UIView, context: Context) {
       guard armed else { return }
       DispatchQueue.main.async {
-        // Disarm after the update pass to avoid "modifying state during view update"
         armed = false
         guard let responder = uiView.window?.firstResponder else { return }
         if let tf = responder as? UITextField {
@@ -372,9 +330,7 @@ private struct SelectAllOnFocusModifier: ViewModifier {
     func updateNSView(_ nsView: NSView, context: Context) {
       guard armed else { return }
       DispatchQueue.main.async {
-        // Disarm after the update pass to avoid "modifying state during view update"
         armed = false
-        // On macOS, SwiftUI TextField uses the window's field editor (NSTextView)
         guard let fieldEditor = nsView.window?.firstResponder as? NSTextView else { return }
         fieldEditor.selectAll(nil)
       }
@@ -383,25 +339,7 @@ private struct SelectAllOnFocusModifier: ViewModifier {
 #endif
 }
 
-#if os(iOS) || os(tvOS)
-import UIKit
-
-private extension UIView {
-  var firstResponder: UIResponder? {
-    if isFirstResponder { return self }
-    for sub in subviews {
-      if let r = sub.firstResponder { return r }
-    }
-    return nil
-  }
-}
-#elseif os(macOS)
-import AppKit
-#endif
-
 private extension View {
-  // Attach to any TextField or text input view.
-  // Pass a condition that becomes true when this view is focused.
   func selectAllOnFocus(when condition: Bool) -> some View {
     modifier(SelectAllOnFocusModifier(condition: condition))
   }
@@ -422,3 +360,4 @@ private extension View {
   ItemView(item: $item)
     .modelContainer(for: [Item.self, Event.self, ItemConfig.self], inMemory: true)
 }
+

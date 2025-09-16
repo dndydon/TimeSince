@@ -14,7 +14,6 @@ struct ItemConfigEditView: View {
   let item: Item
   let config: ItemConfig
 
-  @State private var configName: String
   @State private var reminding: Bool
   @State private var remindAt: Date
   @State private var remindIntervalText: String
@@ -26,19 +25,15 @@ struct ItemConfigEditView: View {
     self.item = item
     self.config = config
     self.onComplete = onComplete
-    _configName = State(initialValue: config.configName)
     _reminding = State(initialValue: config.reminding)
-    _remindAt = State(initialValue: config.remindAt)
+    // Default to "now" on open, per request
+    _remindAt = State(initialValue: .now)
     _remindIntervalText = State(initialValue: String(config.remindInterval))
     _timeUnits = State(initialValue: config.timeUnits)
   }
 
   var body: some View {
     Form {
-      Section(header: Text("General")) {
-        TextField("Configuration Name", text: $configName)
-      }
-
       Section(header: Text("Reminders")) {
         Toggle("Reminding", isOn: $reminding)
         DatePicker("Remind At", selection: $remindAt, displayedComponents: [.hourAndMinute])
@@ -88,13 +83,16 @@ struct ItemConfigEditView: View {
   }
 
   private func saveConfig() {
-    config.configName = configName.trimmingCharacters(in: .whitespacesAndNewlines)
     config.reminding = reminding
     config.remindAt = remindAt
     if let interval = Int(remindIntervalText.trimmingCharacters(in: .whitespacesAndNewlines)), interval > 0 {
       config.remindInterval = interval
     }
     config.timeUnits = timeUnits
+
+    // Keep the parent item’s lastModified fresh for sorting and UI.
+    item.lastModified = .now
+
     dismiss()
     onComplete(.saved)
   }
@@ -102,6 +100,10 @@ struct ItemConfigEditView: View {
   private func deleteConfig() {
     // Detach from item; keep object around or delete? Here we detach.
     item.config = nil
+
+    // Update the parent item’s lastModified to reflect the change.
+    item.lastModified = .now
+
     dismiss()
     onComplete(.deleted)
   }

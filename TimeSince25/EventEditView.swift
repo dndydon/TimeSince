@@ -7,6 +7,7 @@ enum EventEditResult {
   case cancelled
 }
 
+@MainActor
 struct EventEditView: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(\.modelContext) private var modelContext
@@ -41,7 +42,7 @@ struct EventEditView: View {
             .lineLimit(3...6)
         }
       }
-      .navigationTitle("Edit Event")
+      .navigationTitle("Event")
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Cancel") {
@@ -67,23 +68,33 @@ struct EventEditView: View {
 
   private func saveEvent() {
     event.timestamp = timestamp
+
     if let number = Double(valueText.trimmingCharacters(in: .whitespacesAndNewlines)), number.isFinite {
       event.value = number
     } else {
       event.value = nil
     }
-    event.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes
-    // Update item's lastModified will be handled by parent on dismiss
+
+    let trimmedNotes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+    event.notes = trimmedNotes.isEmpty ? nil : trimmedNotes
+
+    // Keep the parent item’s lastModified fresh for sorting.
+    event.item?.lastModified = .now
+
     dismiss()
     onComplete(.saved)
   }
 
   private func deleteEvent() {
-    // Remove from owning item
-    if let idx = event.item.history.firstIndex(where: { $0 === event }) {
-      event.item.history.remove(at: idx)
-    }
+    // Capture parent before deletion because the inverse may be cleared during delete.
+    let parent = event.item
+
+    // Delete the event; SwiftData will update the inverse relationship and parent array.
     modelContext.delete(event)
+
+    // Update parent timestamp so sorting/UI remains consistent.
+    parent?.lastModified = .now
+
     dismiss()
     onComplete(.deleted)
   }
@@ -91,7 +102,9 @@ struct EventEditView: View {
 
 #Preview {
   let item = Item(name: "Preview", itemDescription: "Demo")
-  let ev = Event(item: item, timestamp: .now, value: 1.23, notes: "Hello")
+  // Item() creates an initial event; use it for preview instead of adding a second one.
+  let ev = item.history.first ?? Event(item: item, timestamp: .now, value: 1.23, notes: "Hello")
   return EventEditView(event: ev) { _ in }
     .modelContainer(for: [Item.self, Event.self], inMemory: true)
 }
+
