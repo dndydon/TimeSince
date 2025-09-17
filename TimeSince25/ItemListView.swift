@@ -42,11 +42,13 @@ struct ItemListView: View {
         ItemCellView(
           item: item,
           nowTick: nowTick,
-          displayMode: displayMode,
+          displayMode: displayMode, // .tenths or .subunits
           onLongPress: { pressedItem in
             // Provide haptic feedback (iOS) and animate the mutation so the row reorders with animation.
             performHapticForLongPress()
-            withAnimation(.easeInOut) {
+            var txn = Transaction()
+            txn.animation = .easeOut(duration: 0.3)
+            withTransaction(txn) {
               _ = pressedItem.createEvent(timestamp: .now)
               // createEvent updates lastModified; @Query sorts by lastModified desc, so this row moves to top.
             }
@@ -62,13 +64,14 @@ struct ItemListView: View {
       }
       .onDelete(perform: deleteItems)
     }
+    .animation(.easeOut(duration: 0.3), value: items)
 #if os(iOS)
     .listStyle(.grouped)
+    .navigationBarTitleDisplayMode(.inline)
 #else
     .listStyle(.inset)
 #endif
-    .navigationTitle("TimeSince")
-    .navigationBarTitleDisplayMode(.inline)
+    .navigationTitle("Time Since")
     .toolbar {
 #if os(iOS)
       // Leading: Info (question mark) to open settings/info sheet

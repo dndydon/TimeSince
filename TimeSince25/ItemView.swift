@@ -116,19 +116,17 @@ struct ItemView: View {
         // MARK: - History
         Section(header: historyHeader()) {
           if let sorted = sortedHistory(), !sorted.isEmpty {
-            List {
-              // Include historyVersion in the ForEach id space to ensure refresh
-              ForEach(sorted, id: \.id) { event in
-                Button {
-                  selectedEvent = event
-                  showingEventEditor = true
-                } label: {
-                  EventRowView(event: event)
-                }
-                .buttonStyle(.plain)
+            ForEach(sorted, id: \.id) { event in
+              Button {
+                selectedEvent = event
+                showingEventEditor = true
+              } label: {
+                EventRowView(event: event)
               }
-              .onDelete(perform: deleteEvents)
+              .buttonStyle(.plain)
             }
+            .onDelete(perform: deleteEvents)
+            .animation(.snappy, value: historyVersion)
           } else {
             Text("No history available")
               .foregroundColor(.secondary)
@@ -231,22 +229,24 @@ struct ItemView: View {
     guard let item else { return }
     let event = item.createEvent(timestamp: .now)
     recalcLastModifiedFromEvents()
+    do { try modelContext.save() } catch { /* handle or log error if needed */ }
+    historyVersion &+= 1
     selectedEvent = event
     showingEventEditor = true
   }
 
   private func deleteEvents(at offsets: IndexSet) {
     guard item != nil else { return }
-    let sorted = sortedHistory() ?? []
-    let eventsToDelete = offsets.map { sorted[$0] }
-
-    // Delete from the model context first; inverse will update the array
-    for ev in eventsToDelete {
-      modelContext.delete(ev)
+    withAnimation {
+      let sorted = sortedHistory() ?? []
+      let eventsToDelete = offsets.map { sorted[$0] }
+      for ev in eventsToDelete {
+        modelContext.delete(ev)
+      }
+      recalcLastModifiedFromEvents()
+      do { try modelContext.save() } catch { /* handle or log error if needed */ }
+      historyVersion &+= 1
     }
-
-    recalcLastModifiedFromEvents()
-    historyVersion &+= 1
   }
 
   private func saveItem() {
