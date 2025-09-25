@@ -10,7 +10,7 @@ import Foundation
 
 func date(year: Int, month: Int, day: Int = 1) -> Date {
   Calendar.autoupdatingCurrent.date(
-    from: DateComponents(year: year, month: month, day: day)) ?? Date()
+    from: DateComponents(year: year, month: month, day: day, hour: 12 ,minute: 0 ,second: 0)) ?? Date()
 }
 
 extension Calendar.Component {

@@ -125,9 +125,9 @@ extension Item {
 
 /// Item timestamp relative date string formatter - subunits abbreviated
 extension Item {
-  func timeSinceText(date: Date) -> String {
+  func timeSinceText(date: Date, showingRelative: Bool = true) -> String {
     let timeInterval = date.timeIntervalSince(self.lastModified)
-    return modernTimeIntervalString(timeInterval) + " ago"
+    return showingRelative ? modernTimeIntervalString(timeInterval) + " ago" : modernTimeIntervalString(timeInterval)
   }
 
   /// Compute the String that describes the decimal number age of an Item from
@@ -135,13 +135,14 @@ extension Item {
   /// - Parameters:
   ///   - date: the end Date to compute the age to
   /// - Returns: String
-  func decimalTimeSinceText(date: Date) -> String {
+  func decimalTimeSinceText(date: Date, showingRelative: Bool = true) -> String {
     // Measure from the item's lastModified (or latest event) to the provided date.
     let start = self.lastModified
     let end = date
 
     // Guard against inverted intervals; treat negative durations as zero.
     let duration = max(0, end.timeIntervalSince(start))
+    //let duration = date.timeIntervalSince(self.lastModified)  // DDS  (what if we WANT to allow negative intervals, future dates?)
 
     // Choose the most significant unit that fits the duration.
     // Uses average month/year lengths defined in Calendar.Component.standardTimeInterval().
@@ -163,8 +164,7 @@ extension Item {
     let ageString = age.formatted(.number.precision(.fractionLength(1)))
 
     let symbol = Item.shortSymbol(for: unit)
-    let string = "\(ageString) \(symbol) ago"
-    return string
+    return showingRelative ? "\(ageString) \(symbol) ago" : "\(ageString) \(symbol)"
   }
 
   // Abbreviated symbols for supported units, with simple pluralization.

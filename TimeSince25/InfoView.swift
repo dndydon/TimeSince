@@ -106,7 +106,7 @@ struct InfoView: View {
       }
       .navigationTitle("Settings")
       .toolbar {
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .cancellationAction) {
           Button("Done") {
             dismiss()
           }

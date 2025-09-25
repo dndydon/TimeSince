@@ -32,7 +32,7 @@ struct ItemCellView: View {
     let elapsedText: String = {
       switch displayMode {
       case .tenths:
-        return item.decimalTimeSinceText(date: nowTick)
+        return item.decimalTimeSinceText(date: nowTick, showingRelative: false)
       case .subUnits:
         return item.timeSinceText(date: nowTick)
       }
@@ -43,13 +43,16 @@ struct ItemCellView: View {
       Text("ItemCellView")
     } label: {
       VStack(alignment: .leading) {
-        HStack {
+        HStack(alignment: .firstTextBaseline) {
           Text(item.name)
             .lineLimit(2)
+            .multilineTextAlignment(.leading)
+            .accessibilityLabel("Item name")
           Spacer()
           Text(elapsedText)
             .fontDesign(.rounded)
-            .foregroundStyle(.secondary)
+            .accessibilityLabel("Time since")
+            .foregroundStyle(due ? .primary : .secondary) //(.secondary)
         }
         HStack {
           // use a method on item that returns the latest Event
@@ -58,6 +61,7 @@ struct ItemCellView: View {
           Text(item.latestEvent?.value?.formatted() ?? "")
         }
         .font(.subheadline)
+        .foregroundStyle(.secondary)
         .lineLimit(1)
       }
       .font(.title3)
@@ -76,7 +80,7 @@ struct ItemCellView: View {
   // Build a concrete item (non-optional) for preview
   let previewItem: Item = {
     let it = Item(
-      name: "Sample Item",
+      name: "Sample Item with a large title that wraps",
       itemDescription: "A sample description",
       config: ItemConfig(
         configName: "Sample Config",
