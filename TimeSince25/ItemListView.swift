@@ -52,6 +52,7 @@ struct ItemListView: View {
               _ = pressedItem.createEvent(timestamp: .now)
               // createEvent updates lastModified; @Query sorts by lastModified desc, so this row moves to top.
             }
+            do { try modelContext.save() } catch { /* handle or log error if needed */ }
           }
         )
           .tag(item) // keep tag for List(selection:)
@@ -138,6 +139,7 @@ struct ItemListView: View {
           selection = nil
         }
         modelContext.delete(item)
+        do { try modelContext.save() } catch { /* handle or log error if needed */ }
       }
     }
   }

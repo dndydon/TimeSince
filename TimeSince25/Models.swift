@@ -125,7 +125,7 @@ extension Item {
 
 /// Item timestamp relative date string formatter - subunits abbreviated
 extension Item {
-  func timeSinceText(date: Date, showingRelative: Bool = true) -> String {
+  public func timeSinceText(date: Date, showingRelative: Bool = true) -> String {
     let timeInterval = date.timeIntervalSince(self.lastModified)
     return showingRelative ? modernTimeIntervalString(timeInterval) + " ago" : modernTimeIntervalString(timeInterval)
   }
@@ -135,7 +135,7 @@ extension Item {
   /// - Parameters:
   ///   - date: the end Date to compute the age to
   /// - Returns: String
-  func decimalTimeSinceText(date: Date, showingRelative: Bool = true) -> String {
+  public func decimalTimeSinceText(date: Date, showingRelative: Bool = true) -> String {
     // Measure from the item's lastModified (or latest event) to the provided date.
     let start = self.lastModified
     let end = date

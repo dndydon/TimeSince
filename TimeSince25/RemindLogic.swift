@@ -63,16 +63,30 @@ enum RemindLogic {
 
   // MARK: - Helpers
 
+//  private static func align(_ date: Date, toTimeOf anchor: Date, calendar: Calendar) -> Date {
+//    let comps = calendar.dateComponents([.year, .month, .day], from: date)
+//    let time = calendar.dateComponents([.hour, .minute, .second], from: anchor)
+//    var merged = DateComponents()
+//    merged.year = comps.year
+//    merged.month = comps.month
+//    merged.day = comps.day
+//    merged.hour = time.hour
+//    merged.minute = time.minute
+//    merged.second = time.second
+//    return calendar.date(from: merged) ?? date
+//  }
+
   private static func align(_ date: Date, toTimeOf anchor: Date, calendar: Calendar) -> Date {
     let comps = calendar.dateComponents([.year, .month, .day], from: date)
-    let time = calendar.dateComponents([.hour, .minute, .second], from: anchor)
+    let time = calendar.dateComponents([.hour, .minute], from: anchor) // drop seconds
     var merged = DateComponents()
     merged.year = comps.year
     merged.month = comps.month
     merged.day = comps.day
     merged.hour = time.hour
     merged.minute = time.minute
-    merged.second = time.second
+    merged.second = 0
+    merged.nanosecond = 0
     return calendar.date(from: merged) ?? date
   }
 

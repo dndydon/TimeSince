@@ -254,11 +254,13 @@ struct ItemView: View {
     item.name = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
     item.itemDescription = item.itemDescription.trimmingCharacters(in: .whitespacesAndNewlines)
     recalcLastModifiedFromEvents()
+    do { try modelContext.save() } catch { /* handle or log error if needed */ }
     dismiss()
   }
 
   private func touchLastModified() {
     item?.lastModified = .now
+    do { try modelContext.save() } catch { /* handle or log error if needed */ }
   }
 
   private func recalcLastModifiedFromEvents() {

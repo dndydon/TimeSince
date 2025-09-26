@@ -69,7 +69,6 @@ extension Item {
   }
 }
 
-@MainActor
 extension Event {
   // A lightweight template that can be turned into a real Event for a given Item.
   struct Template {
@@ -77,14 +76,6 @@ extension Event {
     let timeOffset: TimeInterval
     let value: Double?
     let notes: String?
-
-    // Creates and attaches a new Event to the given item, applying an extra hour offset to diversify per-item histories.
-    @discardableResult
-    func materialize(for item: Item, additionalHourOffset: Int = 0) -> Event {
-      let totalOffset = timeOffset - TimeInterval(additionalHourOffset * 60 * 60)
-      let ts = Date.now.addingTimeInterval(totalOffset)
-      return item.createEvent(timestamp: ts, value: value, notes: notes)
-    }
   }
 
   // Public sample templates (10 entries) for tests/consumers that expect 10.
@@ -107,6 +98,16 @@ extension Event {
 }
 
 @MainActor
+extension Event.Template {
+  // Creates and attaches a new Event to the given item, applying an extra hour offset to diversify per-item histories.
+  @discardableResult
+  func materialize(for item: Item, additionalHourOffset: Int = 0) -> Event {
+    let totalOffset = timeOffset - TimeInterval(additionalHourOffset * 60 * 60)
+    let ts = Date.now.addingTimeInterval(totalOffset)
+    return item.createEvent(timestamp: ts, value: value, notes: notes)
+  }
+}
+
 extension ItemConfig {
   static let sampleConfigs: [ItemConfig] = [
     ItemConfig(configName: "5K Run Reminder", reminding: true, remindAt: .now.addingTimeInterval(3600), remindInterval: 1, timeUnits: .day),
@@ -122,7 +123,6 @@ extension ItemConfig {
   ]
 }
 
-@MainActor
 extension Settings {
   static let sampleSettings: [Settings] = [
     Settings(displayTimesUsing: .tenths),

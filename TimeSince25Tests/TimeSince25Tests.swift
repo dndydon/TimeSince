@@ -1,15 +1,10 @@
-//
-//  TimeSince25Tests.swift
-//  TimeSince25Tests
-//
-//  Created by Don Sleeter on 9/1/25.
-//
-
+//#if canImport(Testing)  // this is not needed
 import Testing
 import CoreTransferable
 import SwiftData
 
-@MainActor
+
+@Suite("TimeSince25Tests")
 struct TimeSince25Tests {
   @Test("CRUD for Item")
   func testCRUDItem() async throws {
@@ -82,6 +77,7 @@ struct TimeSince25Tests {
     print("Remaining event notes: \(item.history.first?.notes ?? "none")")
   }
 
+  @MainActor
   @Test("SampleData sanity checks")
   func testSampleData() async throws {
     print("--- SampleData Sanity ---")
@@ -105,3 +101,4 @@ struct TimeSince25Tests {
     #expect(Settings.sampleSettings[1].displayTimesUsing == .subUnits)
   }
 }
+
