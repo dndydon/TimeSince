@@ -48,7 +48,7 @@ struct ItemCellView: View {
             .lineLimit(2)
             .multilineTextAlignment(.leading)
             .accessibilityLabel("Item name")
-          Spacer()
+          Spacer(minLength: 15)
           Text(elapsedText)
             .fontDesign(.rounded)
             .accessibilityLabel("Time since")

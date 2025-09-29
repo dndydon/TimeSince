@@ -29,6 +29,7 @@ extension DateComponentsFormatter {
 /// Global function
 /// - Parameter time: TimeInterval
 /// - Returns: a String using my modernFormat DateComponentsFormatter, above
+@MainActor
 public func modernTimeIntervalString(_ time: TimeInterval) -> String {
   let mf = DateComponentsFormatter.modernFormat.string(from: time)!
   return mf

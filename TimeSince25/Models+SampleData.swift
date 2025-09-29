@@ -109,7 +109,7 @@ extension Event.Template {
 }
 
 extension ItemConfig {
-  static let sampleConfigs: [ItemConfig] = [
+  @MainActor static let sampleConfigs: [ItemConfig] = [
     ItemConfig(configName: "5K Run Reminder", reminding: true, remindAt: .now.addingTimeInterval(3600), remindInterval: 1, timeUnits: .day),
     ItemConfig(configName: "Coffee", reminding: false, remindAt: .now, remindInterval: 4, timeUnits: .hour),
     ItemConfig(configName: "Medication", reminding: true, remindAt: .now.addingTimeInterval(28800), remindInterval: 1, timeUnits: .day),
@@ -124,7 +124,7 @@ extension ItemConfig {
 }
 
 extension Settings {
-  static let sampleSettings: [Settings] = [
+  @MainActor static let sampleSettings: [Settings] = [
     Settings(displayTimesUsing: .tenths),
     Settings(displayTimesUsing: .subUnits)
   ]

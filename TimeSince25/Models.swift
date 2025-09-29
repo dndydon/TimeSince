@@ -114,6 +114,7 @@ extension Item {
   }
 
   // Business rule: is this item due based on its config and last event?
+  @MainActor
   func isDue(now: Date = .now, calendar: Calendar = .current) -> Bool {
     guard let cfg = config else { return false }
     return RemindLogic.isDue(now: now, lastEvent: effectiveLastEventDate, config: cfg, calendar: calendar)
@@ -125,6 +126,7 @@ extension Item {
 
 /// Item timestamp relative date string formatter - subunits abbreviated
 extension Item {
+  @MainActor
   public func timeSinceText(date: Date, showingRelative: Bool = true) -> String {
     let timeInterval = date.timeIntervalSince(self.lastModified)
     return showingRelative ? modernTimeIntervalString(timeInterval) + " ago" : modernTimeIntervalString(timeInterval)
@@ -135,6 +137,7 @@ extension Item {
   /// - Parameters:
   ///   - date: the end Date to compute the age to
   /// - Returns: String
+  @MainActor
   public func decimalTimeSinceText(date: Date, showingRelative: Bool = true) -> String {
     // Measure from the item's lastModified (or latest event) to the provided date.
     let start = self.lastModified

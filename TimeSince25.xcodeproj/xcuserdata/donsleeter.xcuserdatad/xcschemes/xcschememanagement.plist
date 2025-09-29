@@ -6,12 +6,24 @@
 	<dict>
 		<key>TimeSince25.xcscheme_^#shared#^_</key>
 		<dict>
+			<key>isShown</key>
+			<true/>
 			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+		<key>TimeSince25TestsBundle.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>F8074C342E87B8100039FAA8</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>F8F8CFCD2E665072006991BF</key>
 		<dict>
 			<key>primary</key>

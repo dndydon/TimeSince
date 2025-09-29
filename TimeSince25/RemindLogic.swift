@@ -1,8 +1,10 @@
 import Foundation
 
+@MainActor
 enum RemindLogic {
 
   // Compute the next due date from the last event date, using calendar-aware math.
+  @MainActor
   static func nextDueDate(since lastEvent: Date, using config: ItemConfig, calendar: Calendar = .current) -> Date? {
     guard config.reminding else { return nil }
 
@@ -29,6 +31,7 @@ enum RemindLogic {
   }
 
   // Determine if an item is currently due.
+  @MainActor
   static func isDue(now: Date = .now, lastEvent: Date, config: ItemConfig, calendar: Calendar = .current) -> Bool {
     guard config.reminding, let due = nextDueDate(since: lastEvent, using: config, calendar: calendar) else {
       return false
@@ -37,6 +40,7 @@ enum RemindLogic {
   }
 
   // A human-readable summary of the reminder settings.
+  @MainActor
   static func reminderSummary(config: ItemConfig, locale: Locale = .current) -> String {
     guard config.reminding else { return "Reminders off" }
 

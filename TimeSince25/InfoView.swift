@@ -130,7 +130,7 @@ struct InfoView: View {
           }
           .navigationTitle("Help")
           .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItem(placement: .cancellationAction) {
               Button("Done") {
                 showHelpSheet = false
               }
