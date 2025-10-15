@@ -2,16 +2,34 @@
 //  Item.swift
 //  TimeSince25
 //
-//  Created by Don Sleeter on 9/1/25.
+//  Created by Don Sleeter on 9/29/25.
 //
 
 import Foundation
 import SwiftData
 
+
 @Model
 class Item: Identifiable, Hashable {
   // Stable identity separate from the user-visible name
   var id: UUID
+
+/* Business Rules
+
+   To ensure that each Item has a unique name—meaning no two Items
+   can share the same name—we need to introduce a validation step. While
+   SwiftData provides the #Unique macro for enforcing uniqueness, it
+   doesn’t throw an error or offer a clean way to handle violations
+   when the rule is broken.
+
+    As a workaround, we can implement an exists function in the Item model
+    that checks whether a Item with the given name already exists in the database.
+
+    Although it’s possible to place this logic directly in the ItemListView,
+    a better approach is to encapsulate it within the Item class. This not
+    only makes the code more reusable and easier to maintain but also enables
+    unit testing the logic independently of the UI layer.
+*/
 
   // Unique and indexed for faster search
   @Attribute(.unique)
@@ -26,14 +44,14 @@ class Item: Identifiable, Hashable {
   @Relationship(deleteRule: .cascade, inverse: \Event.item)
   var history: [Event] = []
 
-  // Every Item must have exactly one ItemConfig
-  var config: ItemConfig?
+  // Every Item must have exactly one RemindConfig
+  var config: RemindConfig?
 
   init(
     id: UUID = UUID(),
     name: String,
     itemDescription: String,
-    config: ItemConfig? = nil,
+    config: RemindConfig? = nil,
     createdAt: Date = .now,
     lastModified: Date = .now
   ) {
@@ -44,7 +62,7 @@ class Item: Identifiable, Hashable {
     if let provided = config {
       self.config = provided
     } else {
-      self.config = ItemConfig(
+      self.config = RemindConfig(
         configName: "Default",
         reminding: false,
         remindAt: .now,
@@ -65,6 +83,29 @@ class Item: Identifiable, Hashable {
 
   func hash(into hasher: inout Hasher) {
     hasher.combine(id)
+  }
+
+  // Use this to enforce business logic on unique name for Items
+  static func exists(context: ModelContext, name: String, excluding idToExclude: UUID? = nil) throws -> Bool {
+    let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    if let id = idToExclude {
+      let predicate = #Predicate<Item> { item in
+        item.name == trimmed && item.id != id
+      }
+      var descriptor = FetchDescriptor<Item>(predicate: predicate)
+      descriptor.fetchLimit = 1
+      let results = try context.fetch(descriptor)
+      return !results.isEmpty
+    } else {
+      let predicate = #Predicate<Item> { item in
+        item.name == trimmed
+      }
+      var descriptor = FetchDescriptor<Item>(predicate: predicate)
+      descriptor.fetchLimit = 1
+      let results = try context.fetch(descriptor)
+      return !results.isEmpty
+    }
   }
 
   // Convenience to add an Event and maintain the inverse
@@ -105,7 +146,7 @@ extension Item {
 
   // Latest event timestamp if any
   var latestEventDate: Date? {
-    history.max(by: { $0.timestamp < $1.timestamp })?.timestamp
+    latestEvent?.timestamp
   }
 
   // Use latest event if present, otherwise fall back to createdAt
@@ -118,6 +159,14 @@ extension Item {
   func isDue(now: Date = .now, calendar: Calendar = .current) -> Bool {
     guard let cfg = config else { return false }
     return RemindLogic.isDue(now: now, lastEvent: effectiveLastEventDate, config: cfg, calendar: calendar)
+  }
+
+
+  // Business validation: ensure unique item name or throw
+  static func validateUniqueName(context: ModelContext, name: String, excluding idToExclude: UUID? = nil) throws {
+    if try exists(context: context, name: name, excluding: idToExclude) {
+      throw ItemError.duplicateName
+    }
   }
 }
 
@@ -187,105 +236,4 @@ extension Item {
         return String(describing: unit)
     }
   }
-}
-
-
-@Model
-class Event: Identifiable, Hashable {
-  // Stable identity separate from the user-visible name
-  var id: UUID
-
-  var timestamp: Date
-  var value: Double?
-  var notes: String?
-
-  // Make the parent relationship optional so SwiftData can clear it during deletion.
-  var item: Item?
-
-  // Require the owning Item at init time
-  init(id: UUID = UUID(), item: Item, timestamp: Date = .now, value: Double? = nil, notes: String? = nil) {
-    self.id = id
-    self.item = item
-    self.timestamp = timestamp
-    self.value = value
-    self.notes = notes
-  }
-
-  // MARK: - Hashable
-  static func == (lhs: Event, rhs: Event) -> Bool {
-    lhs.id == rhs.id
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-}
-
-@Model
-class ItemConfig: Identifiable, Hashable {
-  // Stable identity separate from the user-visible name
-  var id: UUID
-
-  var configName: String
-  var reminding: Bool
-  var remindAt: Date
-  var remindInterval: Int
-  var timeUnits: Units
-
-  init(id: UUID = UUID(), configName: String, reminding: Bool, remindAt: Date, remindInterval: Int, timeUnits: Units) {
-    self.id = id
-    self.configName = configName
-    self.reminding = reminding
-    self.remindAt = remindAt
-    self.remindInterval = remindInterval
-    self.timeUnits = timeUnits
-  }
-
-  // MARK: - Hashable
-  static func == (lhs: ItemConfig, rhs: ItemConfig) -> Bool {
-    lhs.id == rhs.id
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-}
-
-@Model
-class Settings: Identifiable, Hashable {
-  // Stable identity separate from the user-visible name
-  var id: UUID
-
-  var displayTimesUsing: DisplayTimesUsing
-
-  init(
-    id: UUID = UUID(),
-    displayTimesUsing: DisplayTimesUsing = .tenths
-  ) {
-    self.id = id
-    self.displayTimesUsing = displayTimesUsing
-  }
-
-  // MARK: - Hashable
-  static func == (lhs: Settings, rhs: Settings) -> Bool {
-    lhs.id == rhs.id
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-}
-
-enum DisplayTimesUsing: String, Codable {
-  case tenths = "tenths"
-  case subUnits = "subUnits"
-}
-
-enum Units: String, Codable {
-  case minute
-  case hour
-  case day
-  case week
-  case month
-  case year
 }

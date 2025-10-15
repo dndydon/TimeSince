@@ -52,7 +52,7 @@ struct ItemCellView: View {
           Text(elapsedText)
             .fontDesign(.rounded)
             .accessibilityLabel("Time since")
-            .foregroundStyle(due ? .primary : .secondary) //(.secondary)
+            .foregroundStyle(due ? .primary : .secondary)
         }
         HStack {
           // use a method on item that returns the latest Event
@@ -80,9 +80,9 @@ struct ItemCellView: View {
   // Build a concrete item (non-optional) for preview
   let previewItem: Item = {
     let it = Item(
-      name: "Sample Item with a large title that wraps",
+      name: "Sample Item",
       itemDescription: "A sample description",
-      config: ItemConfig(
+      config: RemindConfig(
         configName: "Sample Config",
         reminding: true,
         remindAt: .now,
@@ -125,6 +125,6 @@ struct ItemCellView: View {
   }
 
   return TickingPreview(item: previewItem)
-    .modelContainer(for: [Item.self, Event.self, ItemConfig.self], inMemory: true)
+    .modelContainer(for: [Item.self, Event.self, RemindConfig.self], inMemory: true)
 }
 

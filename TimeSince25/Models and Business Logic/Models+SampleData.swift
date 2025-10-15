@@ -108,18 +108,18 @@ extension Event.Template {
   }
 }
 
-extension ItemConfig {
-  @MainActor static let sampleConfigs: [ItemConfig] = [
-    ItemConfig(configName: "5K Run Reminder", reminding: true, remindAt: .now.addingTimeInterval(3600), remindInterval: 1, timeUnits: .day),
-    ItemConfig(configName: "Coffee", reminding: false, remindAt: .now, remindInterval: 4, timeUnits: .hour),
-    ItemConfig(configName: "Medication", reminding: true, remindAt: .now.addingTimeInterval(28800), remindInterval: 1, timeUnits: .day),
-    ItemConfig(configName: "Project Meeting", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .week),
-    ItemConfig(configName: "Groceries", reminding: false, remindAt: .now, remindInterval: 7, timeUnits: .day),
-    ItemConfig(configName: "Laundry", reminding: true, remindAt: .now.addingTimeInterval(43200), remindInterval: 3, timeUnits: .day),
-    ItemConfig(configName: "Water Plants", reminding: true, remindAt: .now.addingTimeInterval(21600), remindInterval: 2, timeUnits: .day),
-    ItemConfig(configName: "Workout", reminding: true, remindAt: .now.addingTimeInterval(32400), remindInterval: 2, timeUnits: .day),
-    ItemConfig(configName: "Call Mom", reminding: false, remindAt: .now, remindInterval: 14, timeUnits: .day),
-    ItemConfig(configName: "Car Service", reminding: true, remindAt: .now, remindInterval: 6, timeUnits: .month)
+extension RemindConfig {
+  @MainActor static let sampleConfigs: [RemindConfig] = [
+    RemindConfig(configName: "5K Run Reminder", reminding: true, remindAt: .now.addingTimeInterval(3600), remindInterval: 1, timeUnits: .day),
+    RemindConfig(configName: "Coffee", reminding: false, remindAt: .now, remindInterval: 4, timeUnits: .hour),
+    RemindConfig(configName: "Medication", reminding: true, remindAt: .now.addingTimeInterval(28800), remindInterval: 1, timeUnits: .day),
+    RemindConfig(configName: "Project Meeting", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .week),
+    RemindConfig(configName: "Groceries", reminding: false, remindAt: .now, remindInterval: 7, timeUnits: .day),
+    RemindConfig(configName: "Laundry", reminding: true, remindAt: .now.addingTimeInterval(43200), remindInterval: 3, timeUnits: .day),
+    RemindConfig(configName: "Water Plants", reminding: true, remindAt: .now.addingTimeInterval(21600), remindInterval: 2, timeUnits: .day),
+    RemindConfig(configName: "Workout", reminding: true, remindAt: .now.addingTimeInterval(32400), remindInterval: 2, timeUnits: .day),
+    RemindConfig(configName: "Call Mom", reminding: false, remindAt: .now, remindInterval: 14, timeUnits: .day),
+    RemindConfig(configName: "Car Service", reminding: true, remindAt: .now, remindInterval: 6, timeUnits: .month)
   ]
 }
 
@@ -138,7 +138,7 @@ extension ModelContainer {
     let schema = Schema([
       Item.self,
       Event.self,
-      ItemConfig.self,
+      RemindConfig.self,
       Settings.self
     ])
     let configuration = ModelConfiguration(isStoredInMemoryOnly: true)

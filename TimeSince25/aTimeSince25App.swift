@@ -11,16 +11,10 @@ import SwiftData
 @main
 struct aTimeSince25App: App {
   var sharedModelContainer: ModelContainer = {
-    let schema = Schema([
-      Item.self,
-      Event.self,
-      ItemConfig.self,
-      Settings.self
-    ])
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
     do {
-      return try ModelContainer(for: schema, configurations: [modelConfiguration])
+      let schema = Schema([Item.self, Event.self, RemindConfig.self, Settings.self])
+      let container = try ModelContainer(for: schema)
+      return container
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }

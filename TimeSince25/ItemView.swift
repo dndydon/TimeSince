@@ -20,6 +20,10 @@ struct ItemView: View {
   // Force list refresh when events are saved/deleted from the sheet
   @State private var historyVersion: Int = 0
 
+  // Duplicate name alert
+  @State private var showingDuplicateAlert: Bool = false
+  @State private var duplicateAlertMessage: String = ""
+
   // Focus handling for text selection
   private enum FocusedField: Hashable {
     case name, description
@@ -94,7 +98,7 @@ struct ItemView: View {
             } else {
               Button {
                 // Create a default config and open editor
-                let cfg = ItemConfig(
+                let cfg = RemindConfig(
                   configName: "New Reminder",
                   reminding: false,
                   remindAt: .now,
@@ -136,6 +140,7 @@ struct ItemView: View {
           }
         }
       }
+      .scrollDismissesKeyboard(.interactively)
       .navigationTitle(item?.name ?? "Item")
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
@@ -178,6 +183,11 @@ struct ItemView: View {
           Text("No event selected")
             .padding()
         }
+      }
+      .alert("Duplicate Name", isPresented: $showingDuplicateAlert) {
+        Button("OK", role: .cancel) { }
+      } message: {
+        Text(duplicateAlertMessage)
       }
     }
   }
@@ -226,6 +236,7 @@ struct ItemView: View {
   }
 
   private func addEvent() {
+    focusedField = nil   // Dismiss keyboard cleanly first
     guard let item else { return }
     let event = item.createEvent(timestamp: .now)
     recalcLastModifiedFromEvents()
@@ -250,11 +261,35 @@ struct ItemView: View {
   }
 
   private func saveItem() {
+    focusedField = nil   // Dismiss keyboard cleanly first
     guard let item else { return }
+
+    // Trim fields
     item.name = item.name.trimmingCharacters(in: .whitespacesAndNewlines)
     item.itemDescription = item.itemDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+    
+    // Validate unique name (exclude this item's own id when editing)
+    do {
+      try Item.validateUniqueName(context: modelContext, name: item.name, excluding: item.id)
+    } catch ItemError.duplicateName {
+      duplicateAlertMessage = "An item named \"\(item.name)\" already exists. Please choose a different name."
+      showingDuplicateAlert = true
+      return
+    } catch {
+      // If validation fails unexpectedly, surface a generic message and block save
+      duplicateAlertMessage = "Could not validate name uniqueness. Please try again."
+      showingDuplicateAlert = true
+      return
+    }
+
+    // Proceed to persist
     recalcLastModifiedFromEvents()
-    do { try modelContext.save() } catch { /* handle or log error if needed */ }
+    do { try modelContext.save() } catch {
+      // As a fallback, if a uniqueness violation slips through, show the same alert
+      duplicateAlertMessage = "Save failed. The name may already exist. Please choose a different name."
+      showingDuplicateAlert = true
+      return
+    }
     dismiss()
   }
 
@@ -352,7 +387,7 @@ private extension View {
     let it = Item(
       name: "Sample Item",
       itemDescription: "A sample description",
-      config: ItemConfig(configName: "Sample Config", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .day)
+      config: RemindConfig(configName: "Sample Config", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .day)
     )
     it.createEvent(timestamp: .now.addingTimeInterval(-3600), value: 3.2, notes: "Earlier")
     it.createEvent(timestamp: .now, value: 7.5, notes: "Latest")
@@ -360,6 +395,6 @@ private extension View {
   }()
 
   ItemView(item: $item)
-    .modelContainer(for: [Item.self, Event.self, ItemConfig.self], inMemory: true)
+    .modelContainer(for: [Item.self, Event.self, RemindConfig.self], inMemory: true)
 }
 

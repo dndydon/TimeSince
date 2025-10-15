@@ -144,19 +144,20 @@ struct ItemListView: View {
     }
   }
 
-  // Generate a unique name like "Untitled", "Untitled 2", "Untitled 3", ...
+  // Generate a unique name like "Untitled", "Untitled 2", ... ensuring store-wide uniqueness via SwiftData
   private func uniqueDefaultName(base: String) -> String {
-    let existingNames = Set(items.map { $0.name })
-    if !existingNames.contains(base) {
+    // First try the base name
+    if (try? Item.exists(context: modelContext, name: base)) == false {
       return base
     }
-    // Try a reasonable range, then fall back to a timestamp to guarantee a return.
+    // Increment a suffix until we find a free name
     for n in 2...10_000 {
       let candidate = "\(base) \(n)"
-      if !existingNames.contains(candidate) {
+      if (try? Item.exists(context: modelContext, name: candidate)) == false {
         return candidate
       }
     }
+    // Fallback: timestamp-based unique name
     return "\(base) \(Int(Date().timeIntervalSince1970))"
   }
 

@@ -44,11 +44,11 @@ struct TimeSince25TestsBundle {
     @Test("CRUD for ItemConfig")
     func testCRUDItemConfig() async throws {
       print("--- ItemConfig CRUD ---")
-      let cfg = ItemConfig(configName: "Config1", reminding: true, remindAt: .now, remindInterval: 5, timeUnits: .day)
+      let cfg = RemindConfig(configName: "Config1", reminding: true, remindAt: .now, remindInterval: 5, timeUnits: .day)
       #expect(cfg.configName == "Config1")
       cfg.reminding = false
       #expect(cfg.reminding == false)
-      var cfgOpt: ItemConfig? = cfg
+      var cfgOpt: RemindConfig? = cfg
       print("TestConfig: \(cfgOpt.debugDescription)")
       cfgOpt = nil
       print("ItemConfig deleted (set to nil)")
@@ -68,7 +68,7 @@ struct TimeSince25TestsBundle {
     @Test("Relationships for Item")
     func testItemRelationships() async throws {
       print("--- Item Relationships ---")
-      let cfg = ItemConfig(configName: "RelConfig", reminding: false, remindAt: .now, remindInterval: 1, timeUnits: .day)
+      let cfg = RemindConfig(configName: "RelConfig", reminding: false, remindAt: .now, remindInterval: 1, timeUnits: .day)
       let item = Item(name: "RelItem", itemDescription: "With relationships", config: cfg)
       #expect(item.history.count == 1)
       #expect(item.history.first?.notes == nil)
@@ -100,9 +100,9 @@ struct TimeSince25TestsBundle {
 
       // Event template count
       #expect(Event.sampleEvents.count == 10, "Should be 10 sample event templates")
-      #expect(ItemConfig.sampleConfigs.count == 10, "Should be 10 sample configs")
-      #expect(ItemConfig.sampleConfigs[0].configName == "5K Run Reminder")
-      #expect(ItemConfig.sampleConfigs[1].reminding == false)
+      #expect(RemindConfig.sampleConfigs.count == 10, "Should be 10 sample configs")
+      #expect(RemindConfig.sampleConfigs[0].configName == "5K Run Reminder")
+      #expect(RemindConfig.sampleConfigs[1].reminding == false)
 
       #expect(Settings.sampleSettings.count == 2)
       #expect(Settings.sampleSettings[0].displayTimesUsing == .tenths)

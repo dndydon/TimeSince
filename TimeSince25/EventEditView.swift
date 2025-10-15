@@ -7,6 +7,11 @@ enum EventEditResult {
   case cancelled
 }
 
+enum FocusedField {
+  case value
+  case notes
+}
+
 @MainActor
 struct EventEditView: View {
   @Environment(\.dismiss) private var dismiss
@@ -15,6 +20,8 @@ struct EventEditView: View {
   @State var timestamp: Date
   @State var valueText: String
   @State var notes: String
+
+  @FocusState private var focused: FocusedField?
 
   let event: Event
   var onComplete: (EventEditResult) -> Void
@@ -42,7 +49,8 @@ struct EventEditView: View {
             .lineLimit(3...6)
         }
       }
-      .navigationTitle("Event")
+      .navigationTitle("\(event.item?.name ?? "Event")")
+      .scrollDismissesKeyboard(.interactively)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Cancel") {
@@ -81,6 +89,7 @@ struct EventEditView: View {
     // Keep the parent item’s lastModified fresh for sorting.
     event.item?.lastModified = .now
 
+    focused = nil
     dismiss()
     onComplete(.saved)
   }
@@ -95,14 +104,14 @@ struct EventEditView: View {
     // Update parent timestamp so sorting/UI remains consistent.
     parent?.lastModified = .now
 
+    focused = nil
     dismiss()
     onComplete(.deleted)
   }
 }
 
 #Preview {
-  let item = Item(name: "Preview", itemDescription: "Demo")
-  // Item() creates an initial event; use it for preview instead of adding a second one.
+  let item = Item(name: "Preview Event", itemDescription: "Demo")
   let ev = item.history.first ?? Event(item: item, timestamp: .now, value: 1.23, notes: "Hello")
   return EventEditView(event: ev) { _ in }
     .modelContainer(for: [Item.self, Event.self], inMemory: true)

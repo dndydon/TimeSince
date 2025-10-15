@@ -5,7 +5,7 @@ enum RemindLogic {
 
   // Compute the next due date from the last event date, using calendar-aware math.
   @MainActor
-  static func nextDueDate(since lastEvent: Date, using config: ItemConfig, calendar: Calendar = .current) -> Date? {
+  static func nextDueDate(since lastEvent: Date, using config: RemindConfig, calendar: Calendar = .current) -> Date? {
     guard config.reminding else { return nil }
 
     let interval = max(1, config.remindInterval)
@@ -32,7 +32,7 @@ enum RemindLogic {
 
   // Determine if an item is currently due.
   @MainActor
-  static func isDue(now: Date = .now, lastEvent: Date, config: ItemConfig, calendar: Calendar = .current) -> Bool {
+  static func isDue(now: Date = .now, lastEvent: Date, config: RemindConfig, calendar: Calendar = .current) -> Bool {
     guard config.reminding, let due = nextDueDate(since: lastEvent, using: config, calendar: calendar) else {
       return false
     }
@@ -41,7 +41,7 @@ enum RemindLogic {
 
   // A human-readable summary of the reminder settings.
   @MainActor
-  static func reminderSummary(config: ItemConfig, locale: Locale = .current) -> String {
+  static func reminderSummary(config: RemindConfig, locale: Locale = .current) -> String {
     guard config.reminding else { return "Reminders off" }
 
     let n = max(1, config.remindInterval)
@@ -66,19 +66,6 @@ enum RemindLogic {
   }
 
   // MARK: - Helpers
-
-//  private static func align(_ date: Date, toTimeOf anchor: Date, calendar: Calendar) -> Date {
-//    let comps = calendar.dateComponents([.year, .month, .day], from: date)
-//    let time = calendar.dateComponents([.hour, .minute, .second], from: anchor)
-//    var merged = DateComponents()
-//    merged.year = comps.year
-//    merged.month = comps.month
-//    merged.day = comps.day
-//    merged.hour = time.hour
-//    merged.minute = time.minute
-//    merged.second = time.second
-//    return calendar.date(from: merged) ?? date
-//  }
 
   private static func align(_ date: Date, toTimeOf anchor: Date, calendar: Calendar) -> Date {
     let comps = calendar.dateComponents([.year, .month, .day], from: date)

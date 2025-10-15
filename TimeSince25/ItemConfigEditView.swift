@@ -12,7 +12,7 @@ struct ItemConfigEditView: View {
 
   // Editing a specific item's config to allow delete to detach from item
   let item: Item
-  let config: ItemConfig
+  let config: RemindConfig
 
   @State private var reminding: Bool
   @State private var remindAt: Date
@@ -21,7 +21,7 @@ struct ItemConfigEditView: View {
 
   var onComplete: (ItemConfigEditResult) -> Void
 
-  init(item: Item, config: ItemConfig, onComplete: @escaping (ItemConfigEditResult) -> Void) {
+  init(item: Item, config: RemindConfig, onComplete: @escaping (ItemConfigEditResult) -> Void) {
     self.item = item
     self.config = config
     self.onComplete = onComplete
@@ -67,6 +67,7 @@ struct ItemConfigEditView: View {
       }
     }
     .navigationTitle("Item Configuration")
+    .scrollDismissesKeyboard(.interactively)
     .toolbar {
       ToolbarItem(placement: .cancellationAction) {
         Button("Cancel") {
@@ -111,7 +112,7 @@ struct ItemConfigEditView: View {
 
 #Preview {
   let item = Item(name: "Preview", itemDescription: "Demo")
-  let cfg = ItemConfig(configName: "Config", reminding: true, remindAt: .now, remindInterval: 2, timeUnits: .day)
+  let cfg = RemindConfig(configName: "Config", reminding: true, remindAt: .now, remindInterval: 2, timeUnits: .day)
   item.config = cfg
   return NavigationStack {
     ItemConfigEditView(item: item, config: cfg) { _ in }
