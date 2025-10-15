@@ -102,3 +102,33 @@ erDiagram
     %% - Settings.displayTimesUsing uses DisplayTimesUsing enum: tenths|subUnits
     %% - App is a pseudo-entity to document storage: Items/Settings in SwiftData; some lightweight prefs via AppStorage
 ```
+
+## Dependencies
+
+This project uses Swift Package Manager (SPM) for dependencies. Xcode will automatically resolve packages when you open or build the project.
+
+Primary dependency:
+- DSRelativeTimeFormatter — a lightweight formatter for concise, human-friendly relative time strings.
+  - Repo: https://github.com/dndydon/DSRelativeTimeFormatter
+  - Version rule: Up to Next Major from 1.0.0 (recommended)
+
+Notes:
+- The exact dependency versions are pinned in `Package.resolved` for reproducible builds. In an Xcode project, this file is located at:
+  `YourProject.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
+- Do not commit build artifacts (DerivedData, .build). Only commit source and the `Package.resolved` file.
+
+## Getting Started
+
+- Requirements:
+  - Xcode 15 or newer (Xcode 15+ recommended)
+  - iOS 17+ (or the minimum platform defined by the project)
+
+- Clone the repository and open the project in Xcode:
+  1. `git clone https://github.com/dndydon/TimeSince.git`
+  2. Open `TimeSince25.xcodeproj` (or the workspace, if present) in Xcode.
+  3. Build the project. Xcode will fetch and resolve SPM dependencies automatically.
+
+- If you prefer command-line builds:
+  - Resolve packages and build with Xcode:
+    ```bash
+    xcodebuild -scheme TimeSince25 -destination 'platform=iOS Simulator,name=iPhone 15' build

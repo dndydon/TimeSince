@@ -31,6 +31,7 @@
 		F8E16D3C2EA03FED00C72D32 /* Exceptions for "TimeSince25" folder in "TimeSince25" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Models and Business Logic/TimeSinceERDiagram_SchemaV1.png",
 				"Models and Business Logic/TimeSinceERDiagram.md",
 			);
 			target = F8F8CFCD2E665072006991BF /* TimeSince25 */;
