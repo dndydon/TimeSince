@@ -110,16 +110,16 @@ extension Event.Template {
 
 extension RemindConfig {
   @MainActor static let sampleConfigs: [RemindConfig] = [
-    RemindConfig(configName: "5K Run Reminder", reminding: true, remindAt: .now.addingTimeInterval(3600), remindInterval: 1, timeUnits: .day),
-    RemindConfig(configName: "Coffee", reminding: false, remindAt: .now, remindInterval: 4, timeUnits: .hour),
+    RemindConfig(configName: "5K Run Reminder", reminding: true, remindAt: .now.addingTimeInterval(-3600), remindInterval: 1, timeUnits: .hour),
+    RemindConfig(configName: "Coffee", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .minute),
     RemindConfig(configName: "Medication", reminding: true, remindAt: .now.addingTimeInterval(28800), remindInterval: 1, timeUnits: .day),
     RemindConfig(configName: "Project Meeting", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .week),
-    RemindConfig(configName: "Groceries", reminding: false, remindAt: .now, remindInterval: 7, timeUnits: .day),
-    RemindConfig(configName: "Laundry", reminding: true, remindAt: .now.addingTimeInterval(43200), remindInterval: 3, timeUnits: .day),
+    RemindConfig(configName: "Groceries", reminding: true, remindAt: .now, remindInterval: 7, timeUnits: .day),
+    RemindConfig(configName: "Laundry", reminding: true, remindAt: .now.addingTimeInterval(-439200), remindInterval: 3, timeUnits: .day),
     RemindConfig(configName: "Water Plants", reminding: true, remindAt: .now.addingTimeInterval(21600), remindInterval: 2, timeUnits: .day),
-    RemindConfig(configName: "Workout", reminding: true, remindAt: .now.addingTimeInterval(32400), remindInterval: 2, timeUnits: .day),
-    RemindConfig(configName: "Call Mom", reminding: false, remindAt: .now, remindInterval: 14, timeUnits: .day),
-    RemindConfig(configName: "Car Service", reminding: true, remindAt: .now, remindInterval: 6, timeUnits: .month)
+    RemindConfig(configName: "Workout", reminding: true, remindAt: .now.addingTimeInterval(32400), remindInterval: 2, timeUnits: .minute),
+    RemindConfig(configName: "Call Mom", reminding: true, remindAt: .now, remindInterval: 14, timeUnits: .minute),
+    RemindConfig(configName: "Car Service", reminding: true, remindAt: .now.addingTimeInterval(-439200), remindInterval: 6, timeUnits: .month)
   ]
 }
 

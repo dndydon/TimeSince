@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F81B6BCD2E9F66C100213024 /* DSRelativeTimeFormatter in Frameworks */ = {isa = PBXBuildFile; productRef = F81B6BCC2E9F66C100213024 /* DSRelativeTimeFormatter */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		F8074C392E87B8100039FAA8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -46,25 +50,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F81B6BCD2E9F66C100213024 /* DSRelativeTimeFormatter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		F8CFB6112E8734EF0065C48C /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		F8F8CFC52E665072006991BF = {
 			isa = PBXGroup;
 			children = (
 				F8F8CFD02E665072006991BF /* TimeSince25 */,
 				F8074C362E87B8100039FAA8 /* TimeSince25TestsBundle */,
-				F8CFB6112E8734EF0065C48C /* Frameworks */,
 				F8F8CFCF2E665072006991BF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -121,6 +118,7 @@
 			);
 			name = TimeSince25;
 			packageProductDependencies = (
+				F81B6BCC2E9F66C100213024 /* DSRelativeTimeFormatter */,
 			);
 			productName = TimeSince25;
 			productReference = F8F8CFCE2E665072006991BF /* TimeSince25.app */;
@@ -155,6 +153,7 @@
 			mainGroup = F8F8CFC52E665072006991BF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				F81B6BCB2E9F66C100213024 /* XCRemoteSwiftPackageReference "DSRelativeTimeFormatter" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F8F8CFCF2E665072006991BF /* Products */;
@@ -390,7 +389,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 352;
+				CURRENT_PROJECT_VERSION = 356;
 				DEVELOPMENT_TEAM = 96J2PPD4HG;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -411,7 +410,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stonecanyon.TimeSince25;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -435,7 +434,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 352;
+				CURRENT_PROJECT_VERSION = 356;
 				DEVELOPMENT_TEAM = 96J2PPD4HG;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -456,7 +455,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stonecanyon.TimeSince25;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -505,6 +504,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F81B6BCB2E9F66C100213024 /* XCRemoteSwiftPackageReference "DSRelativeTimeFormatter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dndydon/DSRelativeTimeFormatter.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F81B6BCC2E9F66C100213024 /* DSRelativeTimeFormatter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F81B6BCB2E9F66C100213024 /* XCRemoteSwiftPackageReference "DSRelativeTimeFormatter" */;
+			productName = DSRelativeTimeFormatter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F8F8CFC62E665072006991BF /* Project object */;
 }

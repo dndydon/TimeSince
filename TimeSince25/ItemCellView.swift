@@ -8,6 +8,8 @@
 import SwiftUI
 import SwiftData
 import Combine
+import DSRelativeTimeFormatter
+
 
 struct ItemCellView: View {
   // IMPORTANT: Do not store the model as @State here.
@@ -56,9 +58,9 @@ struct ItemCellView: View {
         }
         HStack {
           // use a method on item that returns the latest Event
-          Text(item.latestEvent?.timestamp.asDateTimeString() ?? "")
+          Text(item.itemDescription)
           Spacer()
-          Text(item.latestEvent?.value?.formatted() ?? "")
+          Text(item.latestEvent?.timestamp.asDateTimeString() ?? "")
         }
         .font(.subheadline)
         .foregroundStyle(.secondary)

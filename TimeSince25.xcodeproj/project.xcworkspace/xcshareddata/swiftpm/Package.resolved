@@ -1,0 +1,15 @@
+{
+  "originHash" : "b6da547e5d47bef55b811cf34014b82f3ffb450f5e6cf9a60f3e5f2940a1a3a9",
+  "pins" : [
+    {
+      "identity" : "dsrelativetimeformatter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dndydon/DSRelativeTimeFormatter.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a01c69ec54ea72d5baabb599a100cb1b6acd1fa3"
+      }
+    }
+  ],
+  "version" : 3
+}
