@@ -4,4 +4,22 @@
    <FileRef
       location = "self:">
    </FileRef>
+   <FileRef
+      location = "group:LICENSE">
+   </FileRef>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
+   <FileRef
+      location = "group:CONTRIBUTING.md">
+   </FileRef>
+   <FileRef
+      location = "group:MigrationPlan.swift">
+   </FileRef>
+   <FileRef
+      location = "group:HelpView.swift">
+   </FileRef>
+   <FileRef
+      location = "group:MailFeedbackService.swift">
+   </FileRef>
 </Workspace>
