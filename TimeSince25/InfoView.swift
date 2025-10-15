@@ -55,13 +55,13 @@ struct InfoView: View {
         Section(header: Text("Unit display")) {
           if let s = activeSettings {
             selectableRow(
-              title: "Display times using tenths", subtitle: "e.g. 1.5 days ago",
+              title: "Display times using tenths", subtitle: "example:  1.5 d ago",
               isSelected: s.displayTimesUsing == .tenths
             ) {
               s.displayTimesUsing = .tenths
             }
             selectableRow(
-              title: "Display times using sub-units", subtitle: "e.g. 1 day 12 hrs ago",
+              title: "Display times using sub-units", subtitle: "example:  1d 12hr ago",
               isSelected: s.displayTimesUsing == .subUnits
             ) {
               s.displayTimesUsing = .subUnits

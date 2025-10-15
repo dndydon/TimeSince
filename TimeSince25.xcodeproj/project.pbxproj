@@ -25,6 +25,16 @@
 		F8F8CFCE2E665072006991BF /* TimeSince25.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeSince25.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F8E16D3C2EA03FED00C72D32 /* Exceptions for "TimeSince25" folder in "TimeSince25" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Models and Business Logic/TimeSinceERDiagram.md",
+			);
+			target = F8F8CFCD2E665072006991BF /* TimeSince25 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F8074C362E87B8100039FAA8 /* TimeSince25TestsBundle */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -33,6 +43,9 @@
 		};
 		F8F8CFD02E665072006991BF /* TimeSince25 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F8E16D3C2EA03FED00C72D32 /* Exceptions for "TimeSince25" folder in "TimeSince25" target */,
+			);
 			path = TimeSince25;
 			sourceTree = "<group>";
 		};
