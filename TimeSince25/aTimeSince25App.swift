@@ -19,9 +19,13 @@ struct aTimeSince25App: App {
   let sharedModelContainer: ModelContainer
 
   init() {
+    // BEWARE: Schema Evolution requires a migration... See: MigrationPlan file for template
     let schema = Schema([Item.self, Event.self, RemindConfig.self, Settings.self])
     do {
-      self.sharedModelContainer = try ModelContainer(for: schema)
+      self.sharedModelContainer = try ModelContainer(
+        for: schema,
+        migrationPlan: AppMigrationPlan.self
+      )
     } catch {
       fatalError("Could not create local ModelContainer: \(error)")
     }

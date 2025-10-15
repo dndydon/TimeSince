@@ -32,7 +32,7 @@ struct InfoView: View {
               Text("Help")
               Spacer()
               Image(systemName: "chevron.right")
-                //.foregroundColor(.secondary)
+              //.foregroundColor(.secondary)
             }
           }
         }
@@ -102,6 +102,16 @@ struct InfoView: View {
             Text(appVersionString())
               .foregroundColor(.secondary)
           }
+          Button {
+            notImplemented("iCloud sync is not yet implemented.")
+          } label: {
+            HStack {
+              Text("iCloud Synch")
+              Spacer()
+              Text("Disabled")
+              Image(systemName: "chevron.right")
+            }
+          }
         }
       }
       .navigationTitle("Settings")
@@ -122,22 +132,16 @@ struct InfoView: View {
       }
       .sheet(isPresented: $showHelpSheet) {
         NavigationStack {
-          Form {
-            Section {
-              Text("Help content goes here.")
-                .foregroundColor(.secondary)
-            }
-          }
-          .navigationTitle("Help")
-          .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-              Button("Done") {
-                showHelpSheet = false
+          HelpView()
+            .toolbar {
+              ToolbarItem(placement: .cancellationAction) {
+                Button("Done") {
+                  showHelpSheet = false
+                }
               }
             }
-          }
         }
-        .presentationDetents([.medium, .large])
+        //.presentationDetents([.medium, .large])
       }
     }
   }
@@ -155,8 +159,8 @@ struct InfoView: View {
           Text(title)
             .foregroundColor(.primary)
           Text(subtitle ?? "")
-          .font(Font.caption.bold())
-          .foregroundStyle(Color.secondary)
+            .font(Font.caption.bold())
+            .foregroundStyle(Color.secondary)
         }
         Spacer()
         if isSelected {
