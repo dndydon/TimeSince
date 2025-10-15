@@ -22,6 +22,8 @@
 
 /* Begin PBXFileReference section */
 		F8074C352E87B8100039FAA8 /* TimeSince25TestsBundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimeSince25TestsBundle.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F81E0D342EA053BD009EBD41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F81E0D782EA05973009EBD41 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		F8F8CFCE2E665072006991BF /* TimeSince25.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeSince25.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -36,7 +38,6 @@
 		F8E16D422EA0522400C72D32 /* Exceptions for "docs" folder in "TimeSince25" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				README.md,
 				Schema/README.md,
 				Schema/SchemaV1.md,
 			);
@@ -90,6 +91,8 @@
 		F8F8CFC52E665072006991BF = {
 			isa = PBXGroup;
 			children = (
+				F81E0D342EA053BD009EBD41 /* README.md */,
+				F81E0D782EA05973009EBD41 /* LICENSE */,
 				F8E16D412EA0520700C72D32 /* docs */,
 				F8F8CFD02E665072006991BF /* TimeSince25 */,
 				F8074C362E87B8100039FAA8 /* TimeSince25TestsBundle */,
