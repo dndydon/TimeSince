@@ -33,12 +33,29 @@
 			);
 			target = F8F8CFCD2E665072006991BF /* TimeSince25 */;
 		};
+		F8E16D422EA0522400C72D32 /* Exceptions for "docs" folder in "TimeSince25" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				README.md,
+				Schema/README.md,
+				Schema/SchemaV1.md,
+			);
+			target = F8F8CFCD2E665072006991BF /* TimeSince25 */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F8074C362E87B8100039FAA8 /* TimeSince25TestsBundle */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TimeSince25TestsBundle;
+			sourceTree = "<group>";
+		};
+		F8E16D412EA0520700C72D32 /* docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F8E16D422EA0522400C72D32 /* Exceptions for "docs" folder in "TimeSince25" target */,
+			);
+			path = docs;
 			sourceTree = "<group>";
 		};
 		F8F8CFD02E665072006991BF /* TimeSince25 */ = {
@@ -73,6 +90,7 @@
 		F8F8CFC52E665072006991BF = {
 			isa = PBXGroup;
 			children = (
+				F8E16D412EA0520700C72D32 /* docs */,
 				F8F8CFD02E665072006991BF /* TimeSince25 */,
 				F8074C362E87B8100039FAA8 /* TimeSince25TestsBundle */,
 				F8F8CFCF2E665072006991BF /* Products */,
@@ -127,6 +145,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				F8E16D412EA0520700C72D32 /* docs */,
 				F8F8CFD02E665072006991BF /* TimeSince25 */,
 			);
 			name = TimeSince25;
