@@ -101,8 +101,10 @@ struct TimeSince25TestsBundle {
       // Event template count
       #expect(Event.sampleEvents.count == 10, "Should be 10 sample event templates")
       #expect(RemindConfig.sampleConfigs.count == 10, "Should be 10 sample configs")
-      #expect(RemindConfig.sampleConfigs[0].configName == "5K Run Reminder")
-      #expect(RemindConfig.sampleConfigs[1].reminding == false)
+      #expect(RemindConfig.sampleConfigs[1].configName == "Coffee")
+      #expect(RemindConfig.sampleConfigs[1].reminding == true)
+      #expect(RemindConfig.sampleConfigs[1].remindInterval == 1)
+      #expect(RemindConfig.sampleConfigs[1].timeUnits == .minute)
 
       #expect(Settings.sampleSettings.count == 2)
       #expect(Settings.sampleSettings[0].displayTimesUsing == .tenths)

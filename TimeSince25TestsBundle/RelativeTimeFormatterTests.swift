@@ -13,8 +13,8 @@ struct RelativeTimeFormatterTests {
   // Time unit helpers to keep expressions simple for the type-checker
   private let second: TimeInterval = 1
   private let minute: TimeInterval = 60
-  private let hour: TimeInterval = 60 * 60
-  private let day: TimeInterval = 24 * 60 * 60
+  private let hour:   TimeInterval = 60 * 60
+  private let day:    TimeInterval = 24 * 60 * 60
 
   // Helper to create a pair (start, end) with a delta in seconds
   func range(delta: TimeInterval) -> (Date, Date) {

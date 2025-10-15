@@ -26,7 +26,7 @@ struct ItemCellView: View {
   var onLongPress: ((Item) -> Void)? = nil
 
   var body: some View {
-    // Compute due dynamically using the shared "now"
+    // Compute due dynamically using the shared "nowTick"
     let due = item.isDue(now: nowTick)
     let displayColor = due ? ThemeManager.current.highlightColor : Color.primary
 
@@ -34,9 +34,9 @@ struct ItemCellView: View {
     let elapsedText: String = {
       switch displayMode {
       case .tenths:
-        return item.decimalTimeSinceText(date: nowTick, showingRelative: false)
+        return item.decimalTimeSinceText(date: nowTick, showingRelative: true)
       case .subUnits:
-          return item.timeSinceText(date: nowTick, showingRelative: false)
+          return item.timeSinceText(date: nowTick, showingRelative: true)
       }
     }()
 
