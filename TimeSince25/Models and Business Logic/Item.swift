@@ -173,67 +173,33 @@ extension Item {
 
 // MARK: - Item date string formatting
 
-/// Item timestamp relative date string formatter - subunits abbreviated
 extension Item {
+  /// Human-friendly age of this item based on `lastModified`.
+  ///
+  /// Uses abbreviated subunits (s, min, hr, d, wk, mo, yr) and an integer quantity,
+  /// choosing the best-fitting unit for the elapsed time between `lastModified` and `date`.
+  /// Examples: "3 hr ago", "45 s".
+  /// - Parameters:
+  ///   - date: The end date to compare against (typically `.now`).
+  ///   - showingRelative: If `true`, appends " ago" to indicate past time.
+  /// - Returns: A concise string representing the age since `lastModified`.
   @MainActor
   public func timeSinceText(date: Date, showingRelative: Bool = true) -> String {
-    let timeInterval = date.timeIntervalSince(self.lastModified)
-    return showingRelative ? modernTimeIntervalString(timeInterval) + " ago" : modernTimeIntervalString(timeInterval)
+    let formatter = DSRelativeTimeFormatter()
+    return formatter.subunits(from: self.lastModified, to: date, components: 2, showingRelative: showingRelative)
   }
 
-  /// Compute the String that describes the decimal number age of an Item from
-  /// .timestamp (start) to date (end) using the most significant Calendar unit of the DateInterval.
+  /// Human-friendly decimal age of this item based on `lastModified`.
+  ///
+  /// Picks the most significant calendar unit and formats the value with one fractional digit.
+  /// Examples: "1.5 hr ago", "2.3 d".
   /// - Parameters:
-  ///   - date: the end Date to compute the age to
-  /// - Returns: String
+  ///   - date: The end date to compare against (typically `.now`).
+  ///   - showingRelative: If `true`, appends " ago" to indicate past time.
+  /// - Returns: A concise string representing the decimal age since `lastModified`.
   @MainActor
   public func decimalTimeSinceText(date: Date, showingRelative: Bool = true) -> String {
-    // Measure from the item's lastModified (or latest event) to the provided date.
-    let start = self.lastModified
-    let end = date
-
-    // Guard against inverted intervals; treat negative durations as zero.
-    let duration = max(0, end.timeIntervalSince(start))
-    //let duration = date.timeIntervalSince(self.lastModified)  // DDS  (what if we WANT to allow negative intervals, future dates?)
-
-    // Choose the most significant unit that fits the duration.
-    // Uses average month/year lengths defined in Calendar.Component.standardTimeInterval().
-    let unit: Calendar.Component = {
-      if let year   = Calendar.Component.year.standardTimeInterval(), duration >= year { return .year }
-      if let month  = Calendar.Component.month.standardTimeInterval(), duration >= month { return .month }
-      if let week   = Calendar.Component.weekOfYear.standardTimeInterval(), duration >= week { return .weekOfYear }
-      if let day    = Calendar.Component.day.standardTimeInterval(), duration >= day { return .day }
-      if let hour   = Calendar.Component.hour.standardTimeInterval(), duration >= hour { return .hour }
-      if let minute = Calendar.Component.minute.standardTimeInterval(), duration >= minute { return .minute }
-      return .second
-    }()
-
-    // Compute approximate decimal age in the chosen unit.
-    let age: Decimal = date.decimalAge(start: start, end: end, unit: unit)
-    assert(age.isNaN == false)
-
-    // Format with one fractional digit to match decimalAge behavior/expectation.
-    let ageString = age.formatted(.number.precision(.fractionLength(1)))
-
-    let symbol = Item.shortSymbol(for: unit)
-    return showingRelative ? "\(ageString) \(symbol) ago" : "\(ageString) \(symbol)"
-  }
-
-  // Abbreviated symbols for supported units, with simple pluralization.
-  // - note: since we are using short abbreviations, we only need/want singular units.
-  // Fallback to Calendar.Component description if we encounter an unsupported unit.
-  private static func shortSymbol(for unit: Calendar.Component) -> String {
-    switch unit {
-      case .second: return "s"
-      case .minute: return "min"
-      case .hour:   return "hr"
-      case .day:    return "d"
-      case .weekOfMonth, .weekOfYear: return "wk"
-      case .month:  return "mo"
-      case .year:   return "yr"
-      default:
-        // Reasonable fallback; you can expand mapping if you plan to support more units.
-        return String(describing: unit)
-    }
+    let formatter = DSRelativeTimeFormatter()
+    return formatter.decimalMostSignificant(from: self.lastModified, to: date, showingRelative: showingRelative)
   }
 }

@@ -34,7 +34,7 @@ struct ItemCellView: View {
       case .tenths:
         return item.decimalTimeSinceText(date: nowTick, showingRelative: false)
       case .subUnits:
-        return item.timeSinceText(date: nowTick)
+          return item.timeSinceText(date: nowTick, showingRelative: false)
       }
     }()
 

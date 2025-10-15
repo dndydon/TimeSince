@@ -12,7 +12,8 @@ import SwiftData
 
 @Model
 class Event: Identifiable, Hashable {
-  // Stable identity separate from the user-visible name
+
+  // Stable identity separate from any/all stored properties
   var id: UUID
 
   var timestamp: Date
@@ -23,7 +24,13 @@ class Event: Identifiable, Hashable {
   var item: Item?
 
   // Require the owning Item at init time
-  init(id: UUID = UUID(), item: Item, timestamp: Date = .now, value: Double? = nil, notes: String? = nil) {
+  init(
+    id: UUID = UUID(),
+    item: Item,
+    timestamp: Date = .now,
+    value: Double? = nil,
+    notes: String? = nil
+  ) {
     self.id = id
     self.item = item
     self.timestamp = timestamp
@@ -32,6 +39,10 @@ class Event: Identifiable, Hashable {
   }
 
   // MARK: - Hashable
+  // use custom Hashable conformance so equality and hashing are defined
+  // exclusively by the id. This aligns with your use of Identifiable
+  // and avoids surprises as the model evolves.
+
   static func == (lhs: Event, rhs: Event) -> Bool {
     lhs.id == rhs.id
   }
