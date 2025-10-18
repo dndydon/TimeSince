@@ -12,6 +12,8 @@ import DSRelativeTimeFormatter
 
 
 struct ItemCellView: View {
+  @Environment(\.relativeTimeFormatter) private var relativeTimeFormatter
+
   // IMPORTANT: Do not store the model as @State here.
   // Treat it as an input so external changes and parent ticks invalidate the view.
   var item: Item
@@ -34,9 +36,9 @@ struct ItemCellView: View {
     let elapsedText: String = {
       switch displayMode {
       case .tenths:
-        return item.decimalTimeSinceText(date: nowTick, showingRelative: true)
+        return relativeTimeFormatter.decimal(from: item.lastModified, to: nowTick, showingRelative: true)
       case .subUnits:
-          return item.timeSinceText(date: nowTick, showingRelative: true)
+        return relativeTimeFormatter.subunits(from: item.lastModified, to: nowTick, components: 2, showingRelative: true)
       }
     }()
 

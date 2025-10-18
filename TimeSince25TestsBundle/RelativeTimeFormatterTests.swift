@@ -92,7 +92,7 @@ struct RelativeTimeFormatterTests {
   func decimalMostSignificantHours() async throws {
     let delta = 90 * minute // 1.5 hours
     let (start, end) = range(delta: delta)
-    let s = formatter.decimalMostSignificant(from: start, to: end)
+    let s = formatter.decimal(from: start, to: end)
     #expect(s == "1.5 hr ago")
   }
 
@@ -100,7 +100,7 @@ struct RelativeTimeFormatterTests {
   func decimalMostSignificantDays() async throws {
     let delta = 2 * day + 0.34 * day // 2.34 days
     let (start, end) = range(delta: delta)
-    let s = formatter.decimalMostSignificant(from: start, to: end)
+    let s = formatter.decimal(from: start, to: end)
     #expect(s == "2.3 d ago")
   }
 

@@ -172,35 +172,7 @@ extension Item {
 }
 
 
-// MARK: - Item date string formatting
-
-extension Item {
-  /// Human-friendly age of this item based on `lastModified`.
-  ///
-  /// Uses abbreviated subunits (s, min, hr, d, wk, mo, yr) and an integer quantity,
-  /// choosing the best-fitting unit for the elapsed time between `lastModified` and `date`.
-  /// Examples: "3 hr ago", "45 s".
-  /// - Parameters:
-  ///   - date: The end date to compare against (typically `.now`).
-  ///   - showingRelative: If `true`, appends " ago" to indicate past time.
-  /// - Returns: A concise string representing the age since `lastModified`.
-  @MainActor
-  public func timeSinceText(date: Date, showingRelative: Bool = true) -> String {
-    let formatter = DSRelativeTimeFormatter()
-    return formatter.subunits(from: self.lastModified, to: date, components: 2, showingRelative: showingRelative)
-  }
-
-  /// Human-friendly decimal age of this item based on `lastModified`.
-  ///
-  /// Picks the most significant calendar unit and formats the value with one fractional digit.
-  /// Examples: "1.5 hr ago", "2.3 d".
-  /// - Parameters:
-  ///   - date: The end date to compare against (typically `.now`).
-  ///   - showingRelative: If `true`, appends " ago" to indicate past time.
-  /// - Returns: A concise string representing the decimal age since `lastModified`.
-  @MainActor
-  public func decimalTimeSinceText(date: Date, showingRelative: Bool = true) -> String {
-    let formatter = DSRelativeTimeFormatter()
-    return formatter.decimalMostSignificant(from: self.lastModified, to: date, showingRelative: showingRelative)
-  }
-}
+// MARK: - Item date string formatting (moved)
+// Formatting helpers were removed from `Item` to keep concerns separated.
+// Call `DSRelativeTimeFormatter` directly from views/view models, passing
+// `from: item.lastModified` and `to: now` as needed.
