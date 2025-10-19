@@ -3,7 +3,7 @@ Open with MarkChart for viewing
 
 ```mermaid
 ---
-title: TimeSince App — SwiftData ER Diagram (SchemaV1)
+title: TimeSince App — SwiftData ER Diagram (SchemaV1.1)
 ---
 erDiagram
     %% Legend:
@@ -38,12 +38,13 @@ erDiagram
         Bool reminding
         Date remindAt
         Int remindInterval
-        enum timeUnits "minute|hour|day|week|month|year"
+        Enum timeUnits "minute|hour|day|week|month|year"
     }
 
     Settings {
         UUID id PK
-        enum displayTimesUsing "tenths|subUnits"
+        Enum displayTimesUsing "tenths|subUnits"
+        Bool showDetails
     }
 
     %% Relationships with explicit cardinalities
@@ -58,6 +59,6 @@ erDiagram
     %% - Item.history inverse is Event.item; deleteRule: .cascade
     %% - Event.item is optional to allow SwiftData to clear the parent during deletion
     %% - RemindConfig.timeUnits uses Units enum: minute|hour|day|week|month|year
-    %% - Settings.displayTimesUsing uses DisplayTimesUsing enum: tenths|subUnits
+    %% - Settings.displayTimesUsing uses DisplayTimesUsing enum: tenths|subUnits, and .showDetails Bool
     %% - App is a pseudo-entity to document storage: Items/Settings in SwiftData; some lightweight prefs via AppStorage
 ```
