@@ -40,6 +40,8 @@
 		F8E16D422EA0522400C72D32 /* Exceptions for "docs" folder in "TimeSince25" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				ExamplePreviews/ItemListView_noshowDetails.png,
+				ExamplePreviews/ItemListView_showDetails.png,
 				Schema/README.md,
 				Schema/SchemaV1.md,
 			);

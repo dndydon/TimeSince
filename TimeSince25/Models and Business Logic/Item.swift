@@ -64,7 +64,7 @@ class Item: Identifiable, Hashable {
       self.config = provided
     } else {
       self.config = RemindConfig(
-        configName: "Default",
+        configName: "Repeat daily",
         reminding: false,
         remindAt: .now,
         remindInterval: 1,
@@ -72,9 +72,7 @@ class Item: Identifiable, Hashable {
       )
     }
     self.createdAt = createdAt
-    self.lastModified = .now
-    // Create an initial event linked to this item (createEvent appends it)
-    _ = createEvent()
+    self.lastModified = lastModified
   }
 
   // MARK: - Hashable
@@ -116,7 +114,8 @@ class Item: Identifiable, Hashable {
     if history.contains(where: { $0 === event }) == false {
       history.append(event)
     }
-    self.lastModified = .now
+    // Do NOT set lastModified = .now here.
+    // Let the caller recalc from events to keep it consistent with event timestamps.
   }
 
   // Convenience to create and add an Event in one call
@@ -176,3 +175,4 @@ extension Item {
 // Formatting helpers were removed from `Item` to keep concerns separated.
 // Call `DSRelativeTimeFormatter` directly from views/view models, passing
 // `from: item.lastModified` and `to: now` as needed.
+

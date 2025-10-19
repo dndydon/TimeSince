@@ -7,6 +7,22 @@ A SwiftUI app using SwiftData to track items and the time since events, with opt
 - Xcode 26+
 - Swift 6.2+
 
+## Example UI
+Preview assets live under `docs/ExamplePreviews`. The images below are shown side-by-side for quick comparison.
+
+<div align="center" style="display:flex; gap:12px; justify-content:center; align-items:flex-start; flex-wrap:wrap;">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/ExamplePreviews/ItemListView_noshowDetails.png">
+    <img src="docs/ExamplePreviews/ItemListView_noshowDetails.png" alt="Item List — details hidden" width="320" loading="lazy">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/ExamplePreviews/ItemListView_showDetails.png">
+    <img src="docs/ExamplePreviews/ItemListView_showDetails.png" alt="Item List — details shown" width="320" loading="lazy">
+  </picture>
+</div>
+
+_The main list with and without second line of details (light mode)._ 
+
 ## Architecture Overview
 - **UI**: SwiftUI views with state driven by observable models.
 - **Data**: SwiftData `ModelContainer` for persisted entities; lightweight preferences via `@AppStorage`.
@@ -32,7 +48,7 @@ We keep schema versions under `docs/Schema` as V1, V2, ... Each version contains
 
 Authoritative source of truth is the model code. Diagrams and PNGs are artifacts generated from code.
 
-Current version: **SchemaV1**.
+Current version: **SchemaV1.1**.
 
 See: `docs/Schema/SchemaV1.md` for the pinned diagram and notes.
 
@@ -102,34 +118,4 @@ erDiagram
     %% - RemindConfig.timeUnits uses Units enum: minute|hour|day|week|month|year
     %% - Settings.displayTimesUsing uses DisplayTimesUsing enum: tenths|subUnits, and .showDetails Bool
     %% - App is a pseudo-entity to document storage: Items/Settings in SwiftData; some lightweight prefs via AppStorage
-```
 
-## Dependencies
-
-This project uses Swift Package Manager (SPM) for dependencies. Xcode will automatically resolve packages when you open or build the project.
-
-Primary dependency:
-- DSRelativeTimeFormatter — a lightweight formatter for concise, human-friendly relative time strings.
-  - Repo: https://github.com/dndydon/DSRelativeTimeFormatter
-  - Version rule: Up to Next Major from 1.0.0 (recommended)
-
-Notes:
-- The exact dependency versions are pinned in `Package.resolved` for reproducible builds. In an Xcode project, this file is located at:
-  `YourProject.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
-- Do not commit build artifacts (DerivedData, .build). Only commit source and the `Package.resolved` file.
-
-## Getting Started
-
-- Requirements:
-  - Xcode 15 or newer (Xcode 15+ recommended)
-  - iOS 17+ (or the minimum platform defined by the project)
-
-- Clone the repository and open the project in Xcode:
-  1. `git clone https://github.com/dndydon/TimeSince.git`
-  2. Open `TimeSince25.xcodeproj` (or the workspace, if present) in Xcode.
-  3. Build the project. Xcode will fetch and resolve SPM dependencies automatically.
-
-- If you prefer command-line builds:
-  - Resolve packages and build with Xcode:
-    ```bash
-    xcodebuild -scheme TimeSince25 -destination 'platform=iOS Simulator,name=iPhone 15' build

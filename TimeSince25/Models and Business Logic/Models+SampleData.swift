@@ -63,7 +63,7 @@ extension Item {
     // Build event history for each item from the event templates,
     // applying a per-item offset so lists look varied.
     Event.sampleEventTemplates.forEach { template in
-      template.materialize(for: item, additionalHourOffset: idx * 3)
+      template.materialize(for: item, additionalHourOffset: (idx+1))
     }
     return item
   }
@@ -80,16 +80,17 @@ extension Event {
 
   // Public sample templates (10 entries) for tests/consumers that expect 10.
   static let sampleEventTemplates: [Template] = [
-    Template(timeOffset: -(60*60*24), value: 5.2, notes: "Great run!"),
-    Template(timeOffset: -(60*60*3), value: 1, notes: "Espresso shot"),
-    Template(timeOffset: -(60*60*7), value: nil, notes: "Took meds on time"),
-    Template(timeOffset: -(60*60*24*2), value: nil, notes: "Weekly meeting"),
-    Template(timeOffset: -(60*60*24*3), value: 60, notes: "Grocery haul"),
-    Template(timeOffset: -(60*60*24*1.5), value: nil, notes: "Laundry done"),
-    Template(timeOffset: -(60*60*24*0.75), value: nil, notes: "Watered plants"),
-    Template(timeOffset: -(60*60*2), value: 45, notes: "Workout complete"),
-    Template(timeOffset: -(60*60*24*6), value: nil, notes: "Nice chat with Mom"),
-    Template(timeOffset: -(60*60*24*7), value: nil, notes: "Oil changed"),
+    Template(timeOffset: -(60*60*24*14), value: nil, notes: "Two weeks ago baseline"),
+    Template(timeOffset: -(60*60*24*7 + 60*45), value: 5.0, notes: "Last week's session"),
+    Template(timeOffset: -(60*60*24*3 + 60*60*6), value: nil, notes: "Three days ago"),
+    Template(timeOffset: -(60*60*36), value: 1, notes: "Yesterday afternoon"),
+    Template(timeOffset: -(60*60*6), value: nil, notes: "This morning"),
+    Template(timeOffset: -(60*30), value: nil, notes: "About 30 minutes ago"),
+    //Template(timeOffset: -(60*1), value: nil, notes: "1 minute ago"),
+    //Template(timeOffset: (60*60*2), value: nil, notes: "In about 2 hours (future)"),
+    //Template(timeOffset: (60*60*24), value: 45, notes: "Tomorrow (future)"),
+    //Template(timeOffset: (60*60*24*3), value: nil, notes: "In three days (future)"),
+    //Template(timeOffset: -(60*60*24*30), value: nil, notes: "About a month ago")
   ]
 
   // Backwards-compatible alias so existing tests referring to Event.sampleEvents still pass.
@@ -101,7 +102,7 @@ extension Event {
 extension Event.Template {
   // Creates and attaches a new Event to the given item, applying an extra hour offset to diversify per-item histories.
   @discardableResult
-  func materialize(for item: Item, additionalHourOffset: Int = 0) -> Event {
+  func materialize(for item: Item, additionalHourOffset: Int) -> Event {
     let totalOffset = timeOffset - TimeInterval(additionalHourOffset * 60 * 60)
     let ts = Date.now.addingTimeInterval(totalOffset)
     return item.createEvent(timestamp: ts, value: value, notes: notes)
@@ -110,16 +111,26 @@ extension Event.Template {
 
 extension RemindConfig {
   @MainActor static let sampleConfigs: [RemindConfig] = [
-    RemindConfig(configName: "5K Run Reminder", reminding: true, remindAt: .now.addingTimeInterval(-3600), remindInterval: 1, timeUnits: .hour),
-    RemindConfig(configName: "Coffee", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .minute),
-    RemindConfig(configName: "Medication", reminding: true, remindAt: .now.addingTimeInterval(28800), remindInterval: 1, timeUnits: .day),
-    RemindConfig(configName: "Project Meeting", reminding: true, remindAt: .now, remindInterval: 1, timeUnits: .week),
-    RemindConfig(configName: "Groceries", reminding: true, remindAt: .now, remindInterval: 7, timeUnits: .day),
-    RemindConfig(configName: "Laundry", reminding: true, remindAt: .now.addingTimeInterval(-439200), remindInterval: 3, timeUnits: .day),
-    RemindConfig(configName: "Water Plants", reminding: true, remindAt: .now.addingTimeInterval(21600), remindInterval: 2, timeUnits: .day),
-    RemindConfig(configName: "Workout", reminding: true, remindAt: .now.addingTimeInterval(32400), remindInterval: 2, timeUnits: .minute),
-    RemindConfig(configName: "Call Mom", reminding: true, remindAt: .now, remindInterval: 14, timeUnits: .minute),
-    RemindConfig(configName: "Car Service", reminding: true, remindAt: .now.addingTimeInterval(-439200), remindInterval: 6, timeUnits: .month)
+    RemindConfig(configName: "5K Run Reminder", reminding: true,
+                 remindAt: .now.addingTimeInterval(-(60*60*20)), remindInterval: 1, timeUnits: .day),
+    RemindConfig(configName: "Coffee", reminding: true,
+                 remindAt: .now.addingTimeInterval(-(60*20)), remindInterval: 2, timeUnits: .hour),
+    RemindConfig(configName: "Medication", reminding: true,
+                 remindAt: .now.addingTimeInterval(-(60*60*10)), remindInterval: 12, timeUnits: .hour),
+    RemindConfig(configName: "Project Meeting", reminding: true,
+                 remindAt: .now.addingTimeInterval((60*60*22)), remindInterval: 1, timeUnits: .week),
+    RemindConfig(configName: "Groceries", reminding: true,
+                 remindAt: .now.addingTimeInterval(-(60*60*24*6)), remindInterval: 7, timeUnits: .day),
+    RemindConfig(configName: "Laundry", reminding: true,
+                 remindAt: .now.addingTimeInterval(-(60*60*50)), remindInterval: 3, timeUnits: .day),
+    RemindConfig(configName: "Water Plants", reminding: true,
+                 remindAt: .now.addingTimeInterval((60*60*18)), remindInterval: 2, timeUnits: .day),
+    RemindConfig(configName: "Workout", reminding: true,
+                 remindAt: .now.addingTimeInterval(-(60*60*3)), remindInterval: 2, timeUnits: .day),
+    RemindConfig(configName: "Call Mom", reminding: true,
+                 remindAt: .now.addingTimeInterval((60*60*48)), remindInterval: 14, timeUnits: .day),
+    RemindConfig(configName: "Car Service", reminding: true,
+                 remindAt: .now.addingTimeInterval(-(60*60*24*180)), remindInterval: 6, timeUnits: .month)
   ]
 }
 
