@@ -57,8 +57,9 @@ struct TimeSince25TestsBundle {
     @Test("CRUD for Settings")
     func testCRUDSettings() async throws {
       print("--- Settings CRUD ---")
-      let settings = Settings(displayTimesUsing: .tenths /*, displayTheme: thm*/)
+      let settings = Settings(displayTimesUsing: .tenths, showDetails: true)
       #expect(settings.displayTimesUsing == .tenths)
+      #expect(settings.showDetails == true)
       var sOpt: Settings? = settings
       print("TestSettings: \(sOpt.debugDescription)")
       sOpt = nil
@@ -106,9 +107,9 @@ struct TimeSince25TestsBundle {
       #expect(RemindConfig.sampleConfigs[1].remindInterval == 1)
       #expect(RemindConfig.sampleConfigs[1].timeUnits == .minute)
 
-      #expect(Settings.sampleSettings.count == 2)
-      #expect(Settings.sampleSettings[0].displayTimesUsing == .tenths)
-      #expect(Settings.sampleSettings[1].displayTimesUsing == .subUnits)
+      // Settings is a single optional entity; sample provides one
+      #expect(Settings.sample.displayTimesUsing == .tenths)
+      #expect(Settings.sample.showDetails == false)
     }
 
 

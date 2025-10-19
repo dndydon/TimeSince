@@ -16,8 +16,10 @@ struct ItemListView: View {
   @Query(sort: [SortDescriptor(\Item.lastModified, order: .reverse)])
   private var items: [Item]
 
-  // Fetch the (single) Settings row to drive display formatting.
-  @Query private var settingsRows: [Settings]
+  // Fetch Settings internally; expose as a single optional.
+  @Query private var _settingsFetch: [Settings]
+  // Access the single Settings instance (first, created on demand in InfoView)
+  private var settings: Settings? { _settingsFetch.first }
 
   // The selection is owned by the parent (split view); sidebar reads/writes it.
   @Binding var selection: Item?
@@ -34,7 +36,7 @@ struct ItemListView: View {
 
   var body: some View {
     // Determine the active display mode; default to .tenths if no row exists yet.
-    let displayMode: DisplayTimesUsing = settingsRows.first?.displayTimesUsing ?? .tenths
+    let displayMode: DisplayTimesUsing = settings?.displayTimesUsing ?? .tenths
 
     List(selection: $selection) {
       ForEach(items) { item in
@@ -43,6 +45,7 @@ struct ItemListView: View {
           item: item,
           nowTick: nowTick,
           displayMode: displayMode, // .tenths or .subunits
+          showDetails: settings?.showDetails ?? false,
           onLongPress: { pressedItem in
             // Provide haptic feedback (iOS) and animate the mutation so the row reorders with animation.
             performHapticForLongPress()
@@ -191,4 +194,3 @@ struct ItemListView: View {
   }
   .modelContainer(ModelContainer.preview)
 }
-

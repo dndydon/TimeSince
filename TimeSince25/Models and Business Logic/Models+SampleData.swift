@@ -124,10 +124,9 @@ extension RemindConfig {
 }
 
 extension Settings {
-  @MainActor static let sampleSettings: [Settings] = [
-    Settings(displayTimesUsing: .tenths),
-    Settings(displayTimesUsing: .subUnits)
-  ]
+  @MainActor static var sample: Settings {
+    Settings(displayTimesUsing: .tenths, showDetails: true)
+  }
 }
 
 // MARK: - Preview SwiftData Container
@@ -146,8 +145,8 @@ extension ModelContainer {
     let context = container.mainContext
     // Add all sample items (which include their sample event histories and configs)
     Item.sampleItems.forEach { context.insert($0) }
-    // Insert sample settings if desired
-    Settings.sampleSettings.forEach { context.insert($0) }
+    // Insert a single sample settings row
+    context.insert(Settings.sample)
     return container
   }()
 }

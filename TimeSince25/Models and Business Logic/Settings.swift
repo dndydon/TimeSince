@@ -15,13 +15,16 @@ class Settings: Identifiable, Hashable {
   var id: UUID
 
   var displayTimesUsing: DisplayTimesUsing
+  var showDetails: Bool
 
   init(
     id: UUID = UUID(),
-    displayTimesUsing: DisplayTimesUsing = .tenths
+    displayTimesUsing: DisplayTimesUsing = .tenths,
+    showDetails: Bool = false,
   ) {
     self.id = id
     self.displayTimesUsing = displayTimesUsing
+    self.showDetails = showDetails
   }
 
   // MARK: - Hashable

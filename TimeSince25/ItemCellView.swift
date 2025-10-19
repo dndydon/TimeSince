@@ -24,6 +24,9 @@ struct ItemCellView: View {
   // Display mode injected from Settings so cells update reactively
   var displayMode: DisplayTimesUsing = .tenths
 
+  // Display details in second line
+  var showDetails: Bool = false
+
   // Delegate long-press to the parent so it can animate mutations that affect list ordering.
   var onLongPress: ((Item) -> Void)? = nil
 
@@ -58,15 +61,17 @@ struct ItemCellView: View {
             .accessibilityLabel("Time since")
             .foregroundStyle(due ? .primary : .secondary)
         }
-        HStack {
-          // use a method on item that returns the latest Event
-          Text(item.itemDescription)
-          Spacer()
-          Text(item.latestEvent?.timestamp.asDateTimeString() ?? "")
+        if showDetails {
+          HStack {
+            // use a method on item that returns the latest Event
+            Text(item.itemDescription)
+            Spacer()
+            Text(item.latestEvent?.timestamp.asDateTimeString() ?? "")
+          }
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
         }
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
-        .lineLimit(1)
       }
       .font(.title3)
       .fontWeight(.heavy)

@@ -12,10 +12,10 @@ struct InfoView: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(\.modelContext) private var modelContext
 
-  // Fetch Settings rows; we will ensure there is exactly one active instance.
-  @Query private var settingsRows: [Settings]
+  // Single optional Settings instance (0 or 1); app ensures one exists at startup
+  @Query private var _settingsFetch: [Settings]
+  private var settings: Settings? { _settingsFetch.first }
 
-  @State private var activeSettings: Settings?
   @State private var showHelpSheet: Bool = false
   @State private var showNotImplementedAlert: Bool = false
   @State private var notImplementedMessage: String = ""
@@ -53,21 +53,38 @@ struct InfoView: View {
 
         // MARK: - Unit display (Settings)
         Section(header: Text("Unit display")) {
-          if let s = activeSettings {
-            selectableRow(
-              title: "Display times using tenths", subtitle: "example:  1.5 d ago",
-              isSelected: s.displayTimesUsing == .tenths
-            ) {
+          selectableRow(
+            title: "Display times using tenths", subtitle: "example:  1.5 d ago",
+            isSelected: settings?.displayTimesUsing == .tenths
+          ) {
+            if let s = settings {
               s.displayTimesUsing = .tenths
+              do { try modelContext.save() } catch { /* handle error if desired */ }
             }
-            selectableRow(
-              title: "Display times using sub-units", subtitle: "example:  1d 12hr ago",
-              isSelected: s.displayTimesUsing == .subUnits
-            ) {
+          }
+          selectableRow(
+            title: "Display times using sub-units", subtitle: "example:  1d 12hr ago",
+            isSelected: settings?.displayTimesUsing == .subUnits
+          ) {
+            if let s = settings {
               s.displayTimesUsing = .subUnits
+              do { try modelContext.save() } catch { /* handle error if desired */ }
             }
-          } else {
-            Text("Loading settings…").foregroundColor(.secondary)
+          }
+        }
+
+        // MARK: - Unit display (Settings)
+        Section(header: Text("Display more details")) {
+          Toggle(isOn: Binding(
+            get: { settings?.showDetails ?? false },
+            set: { newValue in
+              if let s = settings {
+                s.showDetails = newValue
+                do { try modelContext.save() } catch { /* handle error if desired */ }
+              }
+            }
+          )) {
+            Text("Show second line of item info")
           }
         }
 
@@ -122,9 +139,6 @@ struct InfoView: View {
           }
         }
       }
-      .onAppear {
-        ensureSingleSettings()
-      }
       .alert("Not yet implemented", isPresented: $showNotImplementedAlert) {
         Button("OK", role: .cancel) { }
       } message: {
@@ -174,19 +188,6 @@ struct InfoView: View {
   private func notImplemented(_ message: String) {
     notImplementedMessage = message
     showNotImplementedAlert = true
-  }
-
-  private func ensureSingleSettings() {
-    if let existing = settingsRows.first {
-      activeSettings = existing
-    } else {
-      // Create one with defaults
-      let s = Settings(displayTimesUsing: .tenths)
-      modelContext.insert(s)
-      activeSettings = s
-    }
-    // If multiple exist (e.g., from previews), we simply use the first.
-    // You can add a migration to clean them up later if desired.
   }
 
   private func appVersionString() -> String {
