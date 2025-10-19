@@ -109,7 +109,7 @@ struct TimeSince25TestsBundle {
 
       // Settings is a single optional entity; sample provides one
       #expect(Settings.sample.displayTimesUsing == .tenths)
-      #expect(Settings.sample.showDetails == false)
+      #expect(Settings.sample.showDetails == true)
     }
 
 

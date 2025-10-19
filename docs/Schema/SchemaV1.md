@@ -1,14 +1,14 @@
-# SchemaV1
+# SchemaV1.1
 
-This document pins the initial schema. 
+This document pins the current schema. 
 The Mermaid diagram and PNG are artifacts derived from the SwiftData model code.
 
 - Mermaid ER diagram (embedded below)
-- PNG snapshot: see `Models/TimeSinceERDiagram_SchemaV1` (ensure it is exported from this diagram)
+- PNG snapshot: see `Models/TimeSinceERDiagram_SchemaV1.1` (ensure it is exported from this diagram)
 
 ```mermaid
 ---
-title: TimeSince App — SwiftData ER Diagram (SchemaV1)
+title: TimeSince App — SwiftData ER Diagram (SchemaV1.1)
 ---
 erDiagram
     %% Legend:
@@ -43,12 +43,13 @@ erDiagram
         Bool reminding
         Date remindAt
         Int remindInterval
-        enum timeUnits "minute|hour|day|week|month|year"
+        Enum timeUnits "minute|hour|day|week|month|year"
     }
 
     Settings {
         UUID id PK
-        enum displayTimesUsing "tenths|subUnits"
+        Enum displayTimesUsing "tenths|subUnits"
+        Bool showDetails
     }
 
     %% Relationships with explicit cardinalities
@@ -63,6 +64,6 @@ erDiagram
     %% - Item.history inverse is Event.item; deleteRule: .cascade
     %% - Event.item is optional to allow SwiftData to clear the parent during deletion
     %% - RemindConfig.timeUnits uses Units enum: minute|hour|day|week|month|year
-    %% - Settings.displayTimesUsing uses DisplayTimesUsing enum: tenths|subUnits
+    %% - Settings.displayTimesUsing uses DisplayTimesUsing enum: tenths|subUnits, and .showDetails Bool
     %% - App is a pseudo-entity to document storage: Items/Settings in SwiftData; some lightweight prefs via AppStorage
 ```
